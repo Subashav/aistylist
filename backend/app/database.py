@@ -11,8 +11,14 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+_db_initialized = False
+
 def init_db():
+    global _db_initialized
+    if _db_initialized:
+        return
     try:
+        import app.models  # Ensures all model classes are registered in Base.metadata
         Base.metadata.create_all(bind=engine)
         with engine.connect() as conn:
             insp = inspect(engine)
@@ -21,12 +27,15 @@ def init_db():
                 if "personalized_analysis" not in cols:
                     conn.execute(text("ALTER TABLE saved_results ADD COLUMN personalized_analysis TEXT"))
                     conn.commit()
-    except Exception:
-        pass
+        _db_initialized = True
+    except Exception as e:
+        print("Database initialization notice:", e)
 
 init_db()
 
 def get_db():
+    if not _db_initialized:
+        init_db()
     db = SessionLocal()
     try:
         yield db

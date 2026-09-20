@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -34,9 +34,16 @@ def signup(user_data: UserSignUp, db: Session = Depends(get_db)):
         email=user_data.email.lower().strip(),
         password_hash=hashed_pw
     )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Registration failed: {exc}"
+        )
 
     token = create_access_token(data={"sub": str(new_user.id)})
     return Token(

@@ -2902,9 +2902,10 @@
           body: JSON.stringify({ email, password })
         });
 
-        const data = await resp.json();
+        const data = await resp.json().catch(() => ({}));
         if (!resp.ok) {
-          banner.textContent = data.detail || 'Invalid email or password. Please verify your details.';
+          let msg = data.detail || (resp.status === 500 ? 'Authentication service error. Please try again in a moment.' : `Sign in failed (HTTP ${resp.status}).`);
+          banner.textContent = msg;
           banner.style.display = 'block';
           btn.disabled = false;
           btn.textContent = 'SIGN IN →';
@@ -2973,13 +2974,13 @@
           })
         });
 
-        const data = await resp.json();
+        const data = await resp.json().catch(() => ({}));
         if (!resp.ok) {
           let errMsg = data.detail;
           if (Array.isArray(errMsg)) {
             errMsg = errMsg.map(item => item.msg).join(', ');
           }
-          banner.textContent = errMsg || 'Could not register account with provided information.';
+          banner.textContent = errMsg || (resp.status === 500 ? 'Registration service encountered an error. Please try again.' : `Registration failed (HTTP ${resp.status}).`);
           banner.style.display = 'block';
           btn.disabled = false;
           btn.textContent = 'CREATE ACCOUNT →';
