@@ -242,7 +242,17 @@ class PersonalizedTryOnCompositor:
         semantic_data: Optional[Any] = None,
     ) -> str:
         title = outfit.get("title", "Casual Classic")
-        cfg = self.model_configs.get(title, self.model_configs["Casual Classic"])
+        keys_list = list(self.model_configs.keys())
+        if title in self.model_configs:
+            cfg = self.model_configs[title]
+        else:
+            look_idx = 0
+            if "look_id" in outfit and isinstance(outfit["look_id"], int):
+                look_idx = outfit["look_id"] - 1
+            elif "index" in outfit and isinstance(outfit["index"], int):
+                look_idx = outfit["index"]
+            chosen_key = keys_list[look_idx % len(keys_list)]
+            cfg = self.model_configs[chosen_key]
         base_img_path = self.assets_dir / cfg["file"]
 
         if not base_img_path.exists():

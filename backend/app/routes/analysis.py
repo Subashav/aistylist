@@ -200,11 +200,13 @@ async def analyze_clothing(
     # Execute exactly up to 2 looks for real FASHN VTON; remaining looks are Complete Outfit & Material Guides
     for idx, outfit_data in enumerate(recommendations["outfit_suggestions"]):
         try:
-            if idx < max_looks_to_generate and u_path and u_path.exists():
+            if idx < max_looks_to_generate:
                 look_seed = 42 + idx * 101
+                person_img = u_path if (u_path and u_path.exists()) else None
+                garment_img = c_path if (c_path and c_path.exists()) else c_content
                 res = await vton_provider.generate_try_on(
-                    person_image=u_path,
-                    garment_image=c_path,
+                    person_image=person_img,
+                    garment_image=garment_img,
                     category=category,
                     styling_context=outfit_data,
                     detected_colour_shade=color_info["colour_shade"],
@@ -402,10 +404,13 @@ async def direct_virtual_tryon(
         "accessories": ["Minimalist watch"],
     }
 
+    p_input = p_path if (p_path and p_path.exists()) else p_content
+    g_input = g_path if (g_path and g_path.exists()) else g_content
+
     vton_provider = get_virtual_tryon_provider()
     res = await vton_provider.generate_try_on(
-        person_image=p_path,
-        garment_image=g_path,
+        person_image=p_input,
+        garment_image=g_input,
         category=category,
         styling_context=look_data,
         detected_colour_shade=detected_shade,
