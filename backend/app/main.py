@@ -1,9 +1,11 @@
 import os
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
-from app.config import settings
+from app.config import BASE_DIR, settings
 from app.database import engine, Base
 import app.models  # Ensures models are loaded
 from app.routes import auth, analysis, saved_results
@@ -21,8 +23,6 @@ app = FastAPI(
 )
 
 # Cross-Origin Resource Sharing for Flutter Web & Mobile
-# Using allow_origin_regex ensures Starlette reflects the actual requesting Origin
-# (e.g., http://localhost:3000, https://aistylist-mu.vercel.app) satisfying browser CORS rules.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -99,9 +99,8 @@ app.include_router(analysis.router)
 app.include_router(saved_results.router)
 
 
-@app.get("/")
 @app.get("/health")
-def root():
+def health_check():
     return {
         "status": "ok",
         "service": "AI Stylist – Personalised Fashion Harmony API",
@@ -110,3 +109,57 @@ def root():
         "vton_enabled": settings.VTON_ENABLED,
         "docs": "/docs"
     }
+
+
+# Static Web App Resolution (checks backend/static first, then frontend/build/web)
+static_candidates = [
+    BASE_DIR / "static",
+    BASE_DIR.parent / "frontend" / "build" / "web"
+]
+static_dir: Path | None = None
+for candidate in static_candidates:
+    if candidate.exists() and (candidate / "index.html").exists():
+        static_dir = candidate
+        break
+
+if static_dir:
+    assets_path = static_dir / "assets"
+    if assets_path.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_path)), name="frontend_assets")
+
+    canvaskit_path = static_dir / "canvaskit"
+    if canvaskit_path.exists():
+        app.mount("/canvaskit", StaticFiles(directory=str(canvaskit_path)), name="frontend_canvaskit")
+
+    icons_path = static_dir / "icons"
+    if icons_path.exists():
+        app.mount("/icons", StaticFiles(directory=str(icons_path)), name="frontend_icons")
+
+    @app.get("/")
+    async def serve_root_index():
+        return FileResponse(str(static_dir / "index.html"))
+
+    @app.get("/favicon.png")
+    async def serve_favicon():
+        fav = static_dir / "favicon.png"
+        if fav.exists():
+            return FileResponse(str(fav))
+        return {"detail": "not found"}
+
+    @app.get("/{full_path:path}")
+    async def serve_spa_route(full_path: str):
+        # If the file exists directly in static_dir, serve it with proper content-type
+        target_file = static_dir / full_path
+        if target_file.is_file():
+            return FileResponse(str(target_file))
+        # Fallback to index.html for SPA routing
+        return FileResponse(str(static_dir / "index.html"))
+else:
+    @app.get("/")
+    def root():
+        return {
+            "status": "ok",
+            "service": "AI Stylist – Personalised Fashion Harmony API",
+            "version": "1.0.0",
+            "docs": "/docs"
+        }
