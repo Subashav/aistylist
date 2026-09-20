@@ -1,0 +1,3602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Stylist — Luxury Fashion-Tech & Virtual Try-On</title>
+  <meta name="description" content="AI Stylist. High-end personalized virtual try-on and wardrobe curation. See how any garment looks on you with authentic styling intelligence.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM TOKENS — LUXURY EDITORIAL (WHITE + BLACK + SOFT GREY)
+       ========================================================================== */
+    :root {
+      --bg-main: #FFFFFF;
+      --bg-soft: #F7F7F5;
+      --bg-hover: #F0F0EE;
+      --border-color: #E8E8E8;
+      --border-dark: #111111;
+      
+      --text-primary: #111111;
+      --text-secondary: #555555;
+      --text-muted: #888888;
+      --accent-luxury: #B79B6C;
+
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      --radius-subtle: 2px;
+      --radius-sm: 4px;
+      
+      --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.04);
+      --shadow-lightbox: 0 20px 40px rgba(0, 0, 0, 0.15);
+
+      --transition-fast: 0.2s ease-out;
+      --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: var(--font-sans);
+      cursor: pointer;
+    }
+
+    /* Container */
+    .app-container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    @media (max-width: 640px) {
+      .app-container {
+        padding: 0 18px;
+      }
+    }
+
+    /* ==========================================================================
+       NAVIGATION HEADER
+       ========================================================================== */
+    header {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 76px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .brand-tagline {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: inline-block;
+    }
+
+    @media (max-width: 768px) {
+      .brand-tagline {
+        display: none;
+      }
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-link {
+      background: none;
+      border: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      position: relative;
+      transition: color var(--transition-fast);
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-link.active {
+      color: var(--text-primary);
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: var(--text-primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-status {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-subtle);
+    }
+
+    /* ==========================================================================
+       BUTTONS & CTA TOKENS
+       ========================================================================== */
+    .btn-primary {
+      background-color: #111111;
+      color: #FFFFFF;
+      border: 1px solid #111111;
+      padding: 14px 28px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: var(--radius-subtle);
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary:hover {
+      background-color: #2b2b2b;
+      border-color: #2b2b2b;
+    }
+
+    .btn-secondary {
+      background-color: #FFFFFF;
+      color: #111111;
+      border: 1px solid var(--border-color);
+      padding: 14px 28px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: var(--radius-subtle);
+      transition: border-color var(--transition-fast), color var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-secondary:hover {
+      border-color: #111111;
+    }
+
+    .btn-text {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--text-primary);
+      transition: opacity var(--transition-fast);
+    }
+
+    .btn-text:hover {
+      opacity: 0.7;
+    }
+
+    /* ==========================================================================
+       HERO & HOME EXPANDED LUXURY EDITORIAL SYSTEM
+       ========================================================================== */
+    .hero-section {
+      padding: 72px 0 64px 0;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 56px;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 960px) {
+      .hero-section {
+        grid-template-columns: 1fr;
+        padding: 48px 0;
+        gap: 36px;
+      }
+    }
+
+    .hero-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-subtle);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-luxury);
+      margin-bottom: 24px;
+    }
+
+    .hero-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #27AE60;
+      display: inline-block;
+      box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-luxury);
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.8rem, 5.5vw, 4.8rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-desc {
+      font-size: 1.12rem;
+      color: var(--text-secondary);
+      max-width: 520px;
+      line-height: 1.65;
+      margin-bottom: 32px;
+      font-weight: 400;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero-trust-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .hero-trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hero-trust-item svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--accent-luxury);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .hero-showcase-container {
+      position: relative;
+    }
+
+    .hero-showcase-card {
+      position: relative;
+      height: 480px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-subtle);
+      overflow: hidden;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .hero-showcase-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-showcase-card:hover img {
+      transform: scale(1.03);
+    }
+
+    .hero-floating-tag {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: var(--radius-subtle);
+    }
+
+    .hero-showcase-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 36px 24px 22px 24px;
+      background: linear-gradient(to top, rgba(17, 17, 17, 0.88) 0%, rgba(17, 17, 17, 0.45) 60%, transparent 100%);
+      color: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .hero-showcase-caption {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #E0C99E;
+      margin-bottom: 4px;
+    }
+
+    .hero-showcase-title {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+
+    .hero-stats-duo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .hero-mini-stat {
+      background: var(--bg-soft);
+      border: 1px solid var(--border-color);
+      padding: 16px 20px;
+      border-radius: var(--radius-subtle);
+    }
+
+    .hero-mini-stat-num {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text-primary);
+    }
+
+    .hero-mini-stat-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Editorial Methodology (3 Steps with Photos) */
+    .home-section-wrap {
+      padding: 88px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .home-header-center {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 56px auto;
+    }
+
+    .home-method-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    @media (max-width: 860px) {
+      .home-method-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+    }
+
+    .home-method-card {
+      border: 1px solid var(--border-color);
+      background: #FFFFFF;
+      border-radius: var(--radius-subtle);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .home-method-card:hover {
+      border-color: #111111;
+      transform: translateY(-3px);
+    }
+
+    .home-method-img-box {
+      width: 100%;
+      height: 280px;
+      background: var(--bg-soft);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .home-method-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 0.5s ease;
+    }
+
+    .home-method-card:hover .home-method-img-box img {
+      transform: scale(1.04);
+    }
+
+    .home-method-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .home-method-step {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-luxury);
+      margin-bottom: 8px;
+    }
+
+    .home-method-title {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .home-method-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* 4 Distinct Look Showcase Grid */
+    .home-directions-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 1080px) {
+      .home-directions-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .home-directions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .home-direction-card {
+      border: 1px solid var(--border-color);
+      background: #FFFFFF;
+      border-radius: var(--radius-subtle);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .home-direction-card:hover {
+      border-color: #111111;
+    }
+
+    .home-direction-img-box {
+      width: 100%;
+      height: 340px;
+      background: var(--bg-soft);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .home-direction-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 0.5s ease;
+    }
+
+    .home-direction-card:hover .home-direction-img-box img {
+      transform: scale(1.03);
+    }
+
+    .home-direction-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: #111111;
+      color: #FFFFFF;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: var(--radius-subtle);
+    }
+
+    .home-direction-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .home-direction-num {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--accent-luxury);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .home-direction-title {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .home-direction-text {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .home-direction-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .home-direction-chip {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      background: var(--bg-soft);
+      padding: 3px 8px;
+      border-radius: var(--radius-subtle);
+    }
+
+    /* Editorial Lookbook Strip */
+    .lookbook-strip-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .lookbook-strip-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .lookbook-strip-item {
+      position: relative;
+      height: 380px;
+      overflow: hidden;
+      border-radius: var(--radius-subtle);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .lookbook-strip-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lookbook-strip-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .lookbook-strip-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(17, 17, 17, 0.85) 0%, rgba(17, 17, 17, 0.2) 60%, transparent 100%);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      color: #FFFFFF;
+      transition: opacity var(--transition-fast);
+    }
+
+    .lookbook-strip-title {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .lookbook-strip-sub {
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #E0C99E;
+      margin-bottom: 12px;
+    }
+
+    .lookbook-strip-btn {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.92);
+      color: #111111;
+      border: none;
+      padding: 6px 14px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: var(--radius-subtle);
+      transition: background-color var(--transition-fast);
+    }
+
+    .lookbook-strip-item:hover .lookbook-strip-btn {
+      background: #FFFFFF;
+    }
+
+    /* Luxury CTA Banner */
+    .home-cta-box {
+      margin: 88px 0;
+      padding: 72px 48px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-subtle);
+      text-align: center;
+    }
+
+    .home-cta-quote {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto 28px auto;
+      line-height: 1.45;
+    }
+
+    .home-cta-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+    }
+
+    .home-cta-desc {
+      font-size: 1.02rem;
+      color: var(--text-secondary);
+      max-width: 540px;
+      margin: 0 auto 36px auto;
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       CONSULTATION & UPLOAD SECTION ("LET'S STYLE YOU.")
+       ========================================================================== */
+    .section-title-wrap {
+      padding: 72px 0 32px 0;
+      text-align: center;
+    }
+
+    .section-headline {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 3.8vw, 3rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .section-subtitle {
+      font-size: 1.02rem;
+      color: var(--text-secondary);
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .upload-dual-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin: 32px 0 40px 0;
+    }
+
+    @media (max-width: 840px) {
+      .upload-dual-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+
+    .upload-box {
+      border: 1px solid var(--border-color);
+      background: var(--bg-main);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-subtle);
+      transition: border-color var(--transition-fast);
+    }
+
+    .upload-box:hover {
+      border-color: #111111;
+    }
+
+    .upload-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .upload-step-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .upload-box-title {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+
+    .dropzone-frame {
+      border: 1px dashed var(--border-color);
+      background: var(--bg-soft);
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: background-color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .dropzone-frame:hover {
+      background: var(--bg-hover);
+      border-color: #111111;
+    }
+
+    .dropzone-frame.has-image {
+      border-style: solid;
+      background: #FFFFFF;
+      padding: 0;
+    }
+
+    .icon-svg-line {
+      width: 32px;
+      height: 32px;
+      stroke: var(--text-primary);
+      stroke-width: 1.3;
+      fill: none;
+      margin-bottom: 14px;
+    }
+
+    .dropzone-prompt {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .dropzone-subtext {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      max-width: 240px;
+      line-height: 1.4;
+    }
+
+    .uploaded-preview-img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .preview-overlay-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.94);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-action-minimal {
+      background: none;
+      border: none;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .btn-action-minimal:hover {
+      color: var(--text-muted);
+    }
+
+    .sample-pill-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .sample-btn-link {
+      background: none;
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: var(--radius-subtle);
+      cursor: pointer;
+      transition: border-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    .sample-btn-link:hover {
+      border-color: #111111;
+      color: #111111;
+    }
+
+    .garment-type-row {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .garment-type-row label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      width: 100px;
+    }
+
+    .garment-select {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      font-family: var(--font-sans);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-subtle);
+      background: #FFFFFF;
+      color: var(--text-primary);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .garment-select:focus {
+      border-color: #111111;
+    }
+
+    /* Central Trigger */
+    .trigger-center {
+      text-align: center;
+      margin: 24px 0 64px 0;
+    }
+
+    .btn-generate-main {
+      min-width: 280px;
+      padding: 18px 36px;
+      font-size: 0.85rem;
+    }
+
+    /* ==========================================================================
+       EDITORIAL ANALYSIS PROGRESS BOX
+       ========================================================================== */
+    .editorial-progress-wrap {
+      display: none;
+      max-width: 580px;
+      margin: 0 auto 64px auto;
+      border: 1px solid var(--border-color);
+      background: var(--bg-soft);
+      padding: 40px;
+      border-radius: var(--radius-subtle);
+    }
+
+    .progress-main-title {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    .editorial-step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .editorial-step-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .editorial-step-item.active {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .editorial-step-item.completed {
+      color: var(--text-primary);
+    }
+
+    .step-marker {
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    /* ==========================================================================
+       RESULTS SECTION ("YOUR LOOKS")
+       ========================================================================== */
+    #resultsSection {
+      display: none;
+      padding-bottom: 96px;
+    }
+
+    .results-hero-header {
+      border-top: 1px solid var(--border-color);
+      padding: 64px 0 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .results-hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .results-hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    .garment-detected-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: #FFFFFF;
+    }
+
+    .color-swatch-box {
+      width: 14px;
+      height: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    /* Personalized Style Analysis Summary Card */
+    .style-analysis-card {
+      border: 1px solid var(--border-color);
+      background: var(--bg-soft);
+      padding: 36px;
+      margin: 32px 0 48px 0;
+      border-radius: var(--radius-subtle);
+    }
+
+    .analysis-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-luxury);
+      margin-bottom: 12px;
+    }
+
+    .analysis-editorial-quote {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--text-primary);
+      margin-bottom: 28px;
+    }
+
+    .analysis-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 768px) {
+      .analysis-metrics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .metric-col-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .metric-col-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* 4 Looks Editorial 2x2 Grid */
+    .looks-editorial-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px 36px;
+    }
+
+    @media (max-width: 900px) {
+      .looks-editorial-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+    }
+
+    .look-editorial-card {
+      border: 1px solid var(--border-color);
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-subtle);
+      transition: border-color var(--transition-fast);
+    }
+
+    .look-editorial-card:hover {
+      border-color: #111111;
+    }
+
+    .look-card-header {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .look-number-label {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.05em;
+    }
+
+    .look-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-subtle);
+    }
+
+    .look-badge.actual-tryon {
+      border-color: var(--accent-luxury);
+      color: var(--accent-luxury);
+      background: #FFFFFF;
+    }
+
+    .look-badge.guide-mode {
+      border-color: var(--border-color);
+      color: var(--text-secondary);
+      background: var(--bg-soft);
+    }
+
+    /* Dominant Try-On Image Area */
+    .look-image-stage {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      background: var(--bg-soft);
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+
+    .look-image-stage img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform var(--transition-normal);
+      display: block;
+    }
+
+    .look-image-stage:hover img {
+      transform: scale(1.02);
+    }
+
+    .image-hover-cue {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(17, 17, 17, 0.85);
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: var(--radius-subtle);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .look-image-stage:hover .image-hover-cue {
+      opacity: 1;
+    }
+
+    /* Outfit Moodboard Box (Looks 3 & 4) */
+    .moodboard-stage {
+      min-height: 480px;
+      background: var(--bg-soft);
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .moodboard-stage-title {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .moodboard-stage-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .palette-row-boxes {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .palette-box-item {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .palette-swatch-rect {
+      height: 44px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      margin-bottom: 6px;
+      border-radius: var(--radius-subtle);
+    }
+
+    .palette-name-text {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .palette-role-text {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .fabric-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .fabric-spec-tag {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: var(--radius-subtle);
+    }
+
+    /* Look Details Body */
+    .look-body-details {
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .look-direction-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .look-meta-line {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .look-desc-text {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    /* Pieces Checklist with Materials */
+    .pieces-header-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .piece-item-row {
+      display: flex;
+      padding: 10px 0;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .piece-item-category {
+      width: 110px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .piece-item-desc {
+      flex: 1;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .piece-item-desc strong {
+      font-weight: 600;
+    }
+
+    .piece-material-sub {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Fabric Harmony Callout */
+    .fabric-harmony-container {
+      background: var(--bg-soft);
+      border: 1px solid var(--border-color);
+      padding: 16px;
+      margin-top: 20px;
+      border-radius: var(--radius-subtle);
+    }
+
+    .fabric-harmony-lead {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .fabric-harmony-quote {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .look-card-bottom {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* ==========================================================================
+       SAVED RESULTS — STYLE ARCHIVE
+       ========================================================================== */
+    #savedSection {
+      display: none;
+      padding: 48px 0 96px 0;
+    }
+
+    .archive-header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 24px;
+      margin-bottom: 40px;
+    }
+
+    .archive-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 36px;
+    }
+
+    @media (max-width: 960px) {
+      .archive-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .archive-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .archive-card {
+      border: 1px solid var(--border-color);
+      background: #FFFFFF;
+      border-radius: var(--radius-subtle);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .archive-img-wrap {
+      width: 100%;
+      height: 380px;
+      background: var(--bg-soft);
+      overflow: hidden;
+    }
+
+    .archive-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .archive-card-details {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .archive-title {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .archive-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .archive-empty-state {
+      text-align: center;
+      padding: 96px 20px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-soft);
+      max-width: 640px;
+      margin: 40px auto;
+    }
+
+    .empty-state-title {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .empty-state-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    /* ==========================================================================
+       PROFILE SECTION — MINIMAL EDITORIAL
+       ========================================================================== */
+    #profileSection {
+      display: none;
+      padding: 48px 0 96px 0;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .profile-group {
+      margin-bottom: 48px;
+    }
+
+    .profile-group-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .profile-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-size: 0.9rem;
+    }
+
+    .profile-label {
+      color: var(--text-secondary);
+    }
+
+    .profile-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       LIGHTBOX MODAL — LUXURY EDITORIAL SIDE-BY-SIDE
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(17, 17, 17, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-container {
+      background: #FFFFFF;
+      max-width: 1080px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: var(--radius-subtle);
+      position: relative;
+      box-shadow: var(--shadow-lightbox);
+    }
+
+    .modal-close-icon {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      z-index: 10;
+      transition: background-color var(--transition-fast);
+    }
+
+    .modal-close-icon:hover {
+      background: var(--bg-soft);
+    }
+
+    .modal-split-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+
+    @media (max-width: 840px) {
+      .modal-split-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .modal-image-col {
+      background: var(--bg-soft);
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-image-col img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      max-height: 80vh;
+      display: block;
+    }
+
+    .modal-info-col {
+      padding: 48px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .modal-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-luxury);
+      margin-bottom: 8px;
+    }
+
+    .modal-look-title {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+
+    .modal-look-desc {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    /* Toast Notification */
+    .toast-pill {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #111111;
+      color: #FFFFFF;
+      padding: 12px 22px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: var(--radius-subtle);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 2000;
+    }
+
+    /* ==========================================================================
+       AUTH MODAL & NAVIGATION LUXURY SYSTEM
+       ========================================================================== */
+    .auth-modal-box {
+      max-width: 440px;
+      padding: 44px 36px 36px 36px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lightbox);
+      border-radius: var(--radius-subtle);
+      position: relative;
+    }
+
+    .auth-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-luxury);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .auth-modal-title {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      text-align: center;
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 28px;
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 12px 8px;
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      cursor: pointer;
+      position: relative;
+      transition: color var(--transition-fast);
+    }
+
+    .auth-tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .auth-tab-btn.active {
+      color: var(--text-primary);
+    }
+
+    .auth-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #111111;
+    }
+
+    .auth-field {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .auth-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 12px 14px;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-subtle);
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color var(--transition-fast);
+    }
+
+    .auth-input:focus {
+      border-color: #111111;
+    }
+
+    .auth-submit-btn {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 0.8rem;
+      margin-top: 8px;
+      margin-bottom: 18px;
+      cursor: pointer;
+    }
+
+    .auth-error-banner {
+      background: #FDF4F4;
+      border-left: 3px solid #C0392B;
+      color: #962D22;
+      font-size: 0.82rem;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    .auth-helper-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      font-size: 0.78rem;
+    }
+
+    .auth-link-btn {
+      background: none;
+      border: none;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+      transition: color var(--transition-fast);
+    }
+
+    .auth-link-btn:hover {
+      color: #111111;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      background: none;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      padding: 7px 14px;
+      border-radius: var(--radius-subtle);
+      transition: border-color var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .nav-user-badge:hover {
+      border-color: #111111;
+      background: var(--bg-soft);
+    }
+
+    .nav-user-badge svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--text-primary);
+      stroke-width: 1.6;
+      fill: none;
+    }
+
+    .nav-btn-signin {
+      background: none;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: opacity var(--transition-fast);
+    }
+
+    .nav-btn-signin:hover {
+      opacity: 0.7;
+    }
+
+    .nav-btn-join {
+      padding: 8px 18px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       TOP EDITORIAL NAVIGATION
+       ======================================================================== -->
+  <header>
+    <div class="app-container">
+      <div class="nav-inner">
+        <a href="javascript:void(0)" class="brand" onclick="navigateTo('home')">
+          <span class="brand-title">AI STYLIST</span>
+          <span class="brand-tagline">Fashion Intelligence</span>
+        </a>
+
+        <nav class="nav-tabs">
+          <button class="nav-link" id="navHome" onclick="navigateTo('home')">Style</button>
+          <button class="nav-link active" id="navTryon" onclick="navigateTo('tryon')">Try-On</button>
+          <button class="nav-link" id="navSaved" onclick="navigateTo('saved')">Saved</button>
+          <button class="nav-link" id="navProfile" onclick="navigateTo('profile')">Profile</button>
+        </nav>
+
+        <div class="nav-actions" id="navActionsContainer">
+          <button type="button" class="nav-btn-signin" onclick="openAuthModal('signin')">SIGN IN</button>
+          <button type="button" class="btn-primary nav-btn-join" onclick="openAuthModal('signup')">JOIN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-container">
+
+    <!-- ========================================================================
+         HOME VIEW — LUXURY EDITORIAL & HIGH-FASHION SHOWCASE
+         ======================================================================== -->
+    <section id="homeSection" style="display: none;">
+      
+      <!-- HERO SPLIT: HEADLINE + EDITORIAL MODEL SHOWCASE -->
+      <div class="hero-section">
+        <div>
+          <div class="hero-badge-pill">
+            <span class="hero-pulse-dot"></span>
+            Personalized AI Wardrobe Assistant
+          </div>
+          <h1 class="hero-title">
+            STYLE<br>
+            YOURSELF,<br>
+            DIFFERENTLY.
+          </h1>
+          <p class="hero-desc">
+            Discover new ways to wear the pieces you already own. Curated head-to-toe styling intelligence calibrated to your skin undertone, physique proportions, and personal aesthetic.
+          </p>
+          <div class="hero-cta-group">
+            <button class="btn-primary" onclick="navigateTo('tryon')">TRY IT ON →</button>
+            <button class="btn-secondary" onclick="navigateTo('saved')">EXPLORE ARCHIVE</button>
+          </div>
+
+          <div class="hero-trust-row">
+            <div class="hero-trust-item">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <span>NVIDIA GPU Local Try-On</span>
+            </div>
+            <div class="hero-trust-item">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <span>Gemini Vision Harmony</span>
+            </div>
+            <div class="hero-trust-item">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <span>Private & Zero Cloud Cost</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- HERO SHOWCASE CARD -->
+        <div class="hero-showcase-container">
+          <div class="hero-showcase-card">
+            <img src="/assets/models/smart_casual_elegance.jpg" alt="Editorial Fashion Styling" onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1000&q=80'" />
+            <div class="hero-floating-tag">
+              <span class="hero-pulse-dot"></span>
+              VTON READY
+            </div>
+            <div class="hero-showcase-overlay">
+              <div>
+                <div class="hero-showcase-caption">Curated Direction 01</div>
+                <div class="hero-showcase-title">Smart Casual Elegance</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 4px 10px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; border-radius: 2px;">
+                HARMONY 99%
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-stats-duo">
+            <div class="hero-mini-stat">
+              <div class="hero-mini-stat-num">04</div>
+              <div class="hero-mini-stat-label">Bespoke Looks Per Garment</div>
+            </div>
+            <div class="hero-mini-stat">
+              <div class="hero-mini-stat-num">100%</div>
+              <div class="hero-mini-stat-label">Authentic Fold & Drape</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: HOW IT WORKS (METHODOLOGY WITH EDITORIAL PHOTOGRAPHY) -->
+      <div class="home-section-wrap">
+        <div class="home-header-center">
+          <div class="hero-eyebrow">The Methodology</div>
+          <h2 class="section-headline">HOW AI STYLIST REIMAGINES YOUR LOOK.</h2>
+          <p class="section-subtitle">A synthesis of Google Gemini computer vision and local diffusion neural virtual try-on calibrated specifically to your physique.</p>
+        </div>
+
+        <div class="home-method-grid">
+          <!-- STEP 1 -->
+          <div class="home-method-card">
+            <div class="home-method-img-box">
+              <img src="/assets/models/casual_classic.jpg" alt="Portrait Analysis" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80'" />
+            </div>
+            <div class="home-method-body">
+              <div class="home-method-step">Step 01 / Perception</div>
+              <h3 class="home-method-title">Undertone & Facial Geometry</h3>
+              <p class="home-method-desc">
+                Gemini Vision scans your portrait to detect warm/cool skin undertones, face shape, and natural contrast levels to determine ideal complementary shades.
+              </p>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="home-method-card">
+            <div class="home-method-img-box">
+              <img src="/assets/showcase/tryon_look1.png" alt="Garment Harmony" onerror="this.src='https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'" />
+            </div>
+            <div class="home-method-body">
+              <div class="home-method-step">Step 02 / Curation</div>
+              <h3 class="home-method-title">Fabric & Chromatic Calibration</h3>
+              <p class="home-method-desc">
+                OpenCV reads precise garment RGB/Hex hues while our recommendation engine curates 4 distinct pairings balancing trousers, footwear, outerwear, and textile drape.
+              </p>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="home-method-card">
+            <div class="home-method-img-box">
+              <img src="/assets/models/elevated_casual___layered.jpg" alt="Virtual Try-On" onerror="this.src='https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80'" />
+            </div>
+            <div class="home-method-body">
+              <div class="home-method-step">Step 03 / Realization</div>
+              <h3 class="home-method-title">Photorealistic Virtual Try-On</h3>
+              <p class="home-method-desc">
+                Local FASHN VTON v1.5 warps and realistically drapes the garment directly onto your photo, rendering natural folds, shadows, and collar structure with zero cloud latency.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: THE 4 WARDROBE DIRECTIONS SHOWCASE -->
+      <div class="home-section-wrap">
+        <div class="home-header-center">
+          <div class="hero-eyebrow">Signature Curation</div>
+          <h2 class="section-headline">ONE PIECE. FOUR DISTINCT EXPRESSIONS.</h2>
+          <p class="section-subtitle">Every consultation unlocks four diverse ways to wear your piece across different dress codes, pant colors, and textile weights.</p>
+        </div>
+
+        <div class="home-directions-grid">
+          <!-- LOOK 1 -->
+          <div class="home-direction-card">
+            <div class="home-direction-img-box">
+              <img src="/assets/showcase/tryon_look1.png" alt="Base Try-On" onerror="this.src='https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80'" />
+              <div class="home-direction-badge">Actual Try-On</div>
+            </div>
+            <div class="home-direction-body">
+              <div class="home-direction-num">Look 01</div>
+              <h3 class="home-direction-title">The Pure Silhouette</h3>
+              <p class="home-direction-text">The garment worn naturally in its cleanest, most flattering everyday combination.</p>
+              <div class="home-direction-chips">
+                <span class="home-direction-chip">Base Garment</span>
+                <span class="home-direction-chip">Clean Trousers</span>
+                <span class="home-direction-chip">Low-Top Sneaker</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOOK 2 -->
+          <div class="home-direction-card">
+            <div class="home-direction-img-box">
+              <img src="/assets/showcase/tryon_look2.png" alt="Pant & Palette Shift" onerror="this.src='https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80'" />
+              <div class="home-direction-badge">Actual Try-On</div>
+            </div>
+            <div class="home-direction-body">
+              <div class="home-direction-num">Look 02</div>
+              <h3 class="home-direction-title">Chromatic Contrast</h3>
+              <p class="home-direction-text">Alternative bottom colorway introducing complementary daytime contrast and personality.</p>
+              <div class="home-direction-chips">
+                <span class="home-direction-chip">Contrast Pant</span>
+                <span class="home-direction-chip">Minimal Belt</span>
+                <span class="home-direction-chip">Leather Loafer</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOOK 3 -->
+          <div class="home-direction-card">
+            <div class="home-direction-img-box">
+              <img src="/assets/models/smart_casual_elegance.jpg" alt="Textile Harmony" onerror="this.src='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=80'" />
+              <div class="home-direction-badge">Styling Guide</div>
+            </div>
+            <div class="home-direction-body">
+              <div class="home-direction-num">Look 03</div>
+              <h3 class="home-direction-title">Textile Balance</h3>
+              <p class="home-direction-text">Strategic interplay of garment textures: heavy twill, textured linen, and suede accents.</p>
+              <div class="home-direction-chips">
+                <span class="home-direction-chip">Raw Denim / Chino</span>
+                <span class="home-direction-chip">Suede Chelsea</span>
+                <span class="home-direction-chip">Woven Belt</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOOK 4 -->
+          <div class="home-direction-card">
+            <div class="home-direction-img-box">
+              <img src="/assets/models/evening_minimalist.jpg" alt="Architectural Layering" onerror="this.src='https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80'" />
+              <div class="home-direction-badge">Styling Guide</div>
+            </div>
+            <div class="home-direction-body">
+              <div class="home-direction-num">Look 04</div>
+              <h3 class="home-direction-title">Architectural Layer</h3>
+              <p class="home-direction-text">Elevating the garment into smart evening or business contexts with tailored outerwear.</p>
+              <div class="home-direction-chips">
+                <span class="home-direction-chip">Structured Blazer</span>
+                <span class="home-direction-chip">Wool Trousers</span>
+                <span class="home-direction-chip">Dress Boot</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: EDITORIAL LOOKBOOK INSPIRATION GALLERY -->
+      <div class="home-section-wrap">
+        <div class="home-header-center">
+          <div class="hero-eyebrow">Editorial Lookbook</div>
+          <h2 class="section-headline">CURATED AESTHETICS.</h2>
+          <p class="section-subtitle">Click any aesthetic to begin styling your pieces in that direction.</p>
+        </div>
+
+        <div class="lookbook-strip-grid">
+          <div class="lookbook-strip-item" onclick="navigateTo('tryon')">
+            <img src="/assets/models/casual_classic.jpg" alt="Clean Minimalist Casual" />
+            <div class="lookbook-strip-overlay">
+              <div class="lookbook-strip-sub">Direction 01</div>
+              <div class="lookbook-strip-title">Clean Minimalist</div>
+              <button type="button" class="lookbook-strip-btn">TRY THIS STYLE →</button>
+            </div>
+          </div>
+
+          <div class="lookbook-strip-item" onclick="navigateTo('tryon')">
+            <img src="/assets/models/smart_casual_elegance.jpg" alt="Contemporary Tailoring" />
+            <div class="lookbook-strip-overlay">
+              <div class="lookbook-strip-sub">Direction 02</div>
+              <div class="lookbook-strip-title">Contemporary Tailoring</div>
+              <button type="button" class="lookbook-strip-btn">TRY THIS STYLE →</button>
+            </div>
+          </div>
+
+          <div class="lookbook-strip-item" onclick="navigateTo('tryon')">
+            <img src="/assets/models/elevated_casual___layered.jpg" alt="Autumnal Layering" />
+            <div class="lookbook-strip-overlay">
+              <div class="lookbook-strip-sub">Direction 03</div>
+              <div class="lookbook-strip-title">Layered Architecture</div>
+              <button type="button" class="lookbook-strip-btn">TRY THIS STYLE →</button>
+            </div>
+          </div>
+
+          <div class="lookbook-strip-item" onclick="navigateTo('tryon')">
+            <img src="/assets/models/evening_minimalist.jpg" alt="Monochrome Evening" />
+            <div class="lookbook-strip-overlay">
+              <div class="lookbook-strip-sub">Direction 04</div>
+              <div class="lookbook-strip-title">Monochrome Evening</div>
+              <button type="button" class="lookbook-strip-btn">TRY THIS STYLE →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: LUXURY CALL TO ACTION BANNER -->
+      <div class="home-cta-box">
+        <p class="home-cta-quote">
+          "Simplicity is the keynote of all true elegance. Fashion is architecture: it is a matter of proportions."
+        </p>
+        <h2 class="home-cta-title">READY TO REIMAGINE YOUR PIECE?</h2>
+        <p class="home-cta-desc">
+          Upload your portrait and a single garment. Experience 4 bespoke outfit combinations crafted to elevate your daily presence.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+          <button class="btn-primary" style="padding: 18px 40px; font-size: 0.85rem;" onclick="navigateTo('tryon')">
+            BEGIN YOUR CONSULTATION →
+          </button>
+          <button class="btn-secondary" style="padding: 18px 32px; font-size: 0.85rem;" onclick="navigateTo('saved')">
+            VIEW SAVED ARCHIVE
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================
+         TRY-ON VIEW — "LET'S STYLE YOU."
+         ======================================================================== -->
+    <section id="tryonSection">
+      
+      <div class="section-title-wrap">
+        <h2 class="section-headline">LET'S STYLE YOU.</h2>
+        <p class="section-subtitle">
+          Upload your photo and the piece you want to try. We will analyze your complexion, build, and garment architecture to deliver 4 tailored outfit combinations.
+        </p>
+      </div>
+
+      <!-- Two Elegant Upload Areas -->
+      <div class="upload-dual-grid">
+        
+        <!-- CARD 1: YOUR PHOTO -->
+        <div class="upload-box" id="userBox">
+          <div class="upload-box-header">
+            <span class="upload-step-tag">Step 01</span>
+            <span class="upload-box-title">YOUR PHOTO</span>
+          </div>
+
+          <div class="dropzone-frame" id="userDropzone" onclick="document.getElementById('userInputFile').click()">
+            <div id="userEmptyContent">
+              <svg class="icon-svg-line" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <div class="dropzone-prompt">+ Upload a clear photo</div>
+              <div class="dropzone-subtext">Clear selfie or portrait facing the camera with natural lighting.</div>
+            </div>
+            <img id="userImgPreview" class="uploaded-preview-img" style="display: none;" alt="User Photo Preview" />
+            <div id="userActionsBar" class="preview-overlay-bar" style="display: none;" onclick="event.stopPropagation()">
+              <button type="button" class="btn-action-minimal" onclick="document.getElementById('userInputFile').click()">CHANGE</button>
+              <button type="button" class="btn-action-minimal" onclick="clearUserPhoto()">REMOVE</button>
+            </div>
+          </div>
+          <input type="file" id="userInputFile" accept="image/*" style="display: none;" onchange="handleUserPhotoSelected(event)" />
+
+          <div class="sample-pill-group">
+            <span>Sample:</span>
+            <button type="button" class="sample-btn-link" onclick="loadDemoPortrait()">Use Studio Portrait</button>
+          </div>
+        </div>
+
+        <!-- CARD 2: YOUR GARMENT -->
+        <div class="upload-box" id="garmentBox">
+          <div class="upload-box-header">
+            <span class="upload-step-tag">Step 02</span>
+            <span class="upload-box-title">YOUR GARMENT</span>
+          </div>
+
+          <div class="dropzone-frame" id="garmentDropzone" onclick="document.getElementById('garmentInputFile').click()">
+            <div id="garmentEmptyContent">
+              <svg class="icon-svg-line" viewBox="0 0 24 24">
+                <path d="M12 3v3m0 0L4 12h16l-8-6zm0 0v2m-8 4v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8"></path>
+              </svg>
+              <div class="dropzone-prompt">+ Upload the piece you want to style</div>
+              <div class="dropzone-subtext">Flat lay, hanger, or product shot with clear fabric visibility.</div>
+            </div>
+            <img id="garmentImgPreview" class="uploaded-preview-img" style="display: none;" alt="Garment Preview" />
+            <div id="garmentActionsBar" class="preview-overlay-bar" style="display: none;" onclick="event.stopPropagation()">
+              <button type="button" class="btn-action-minimal" onclick="document.getElementById('garmentInputFile').click()">CHANGE</button>
+              <button type="button" class="btn-action-minimal" onclick="clearGarmentPhoto()">REMOVE</button>
+            </div>
+          </div>
+          <input type="file" id="garmentInputFile" accept="image/*" style="display: none;" onchange="handleGarmentPhotoSelected(event)" />
+
+          <div class="sample-pill-group">
+            <span>Sample:</span>
+            <button type="button" class="sample-btn-link" onclick="loadDemoBlueTee()">Royal Blue T-Shirt</button>
+          </div>
+
+          <div class="garment-type-row">
+            <label for="categorySelect">Garment Type:</label>
+            <select id="categorySelect" class="garment-select">
+              <option value="T-shirt" selected>T-shirt / Casual Top</option>
+              <option value="Shirt">Button-down / Collared Shirt</option>
+              <option value="Jacket">Jacket / Blazer / Outerwear</option>
+              <option value="Sweater">Sweater / Knitwear / Hoodie</option>
+              <option value="Dress">Dress / One-Piece</option>
+              <option value="Pants">Trousers / Pants / Jeans</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Button -->
+      <div class="trigger-center">
+        <button id="btnSubmitAnalysis" class="btn-primary btn-generate-main" onclick="executeTryOnAnalysis()">
+          TRY IT ON →
+        </button>
+      </div>
+
+      <!-- Editorial Loading State -->
+      <div id="analysisProgressBox" class="editorial-progress-wrap">
+        <h3 class="progress-main-title">ANALYZING YOUR STYLE</h3>
+        <div class="editorial-step-list">
+          <div class="editorial-step-item" id="stepGarment">
+            <span>Understanding your garment</span>
+            <span class="step-marker" id="markerGarment">•</span>
+          </div>
+          <div class="editorial-step-item" id="stepColours">
+            <span>Reading colours</span>
+            <span class="step-marker" id="markerColours">•</span>
+          </div>
+          <div class="editorial-step-item" id="stepLooks">
+            <span>Creating your looks</span>
+            <span class="step-marker" id="markerLooks">•</span>
+          </div>
+          <div class="editorial-step-item" id="stepTryon">
+            <span>Preparing your try-on</span>
+            <span class="step-marker" id="markerTryon">•</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================================
+           RESULTS SCREEN ("YOUR LOOKS")
+           ====================================================================== -->
+      <div id="resultsSection">
+        
+        <div class="results-hero-header">
+          <div>
+            <h2 class="results-hero-title">YOUR LOOKS</h2>
+            <p class="results-hero-subtitle">Four distinct ways to style your piece with complete fabric coordination.</p>
+          </div>
+          <div class="garment-detected-tag">
+            <span id="resultsSwatchBox" class="color-swatch-box" style="background-color: #4169E2;"></span>
+            <span id="resultsGarmentLabel">ROYAL BLUE T-SHIRT</span>
+          </div>
+        </div>
+
+        <!-- Style Analysis Summary Card -->
+        <div class="style-analysis-card">
+          <div class="analysis-eyebrow">Style Harmony Assessment</div>
+          <div id="analysisQuoteText" class="analysis-editorial-quote">
+            "The Royal Blue hue introduces confident luminosity against your complexion undertones, while the balanced neckline maintains natural posture alignment."
+          </div>
+          <div class="analysis-metrics-grid">
+            <div>
+              <div class="metric-col-title">Color Harmony</div>
+              <div id="metricColorNote" class="metric-col-desc">High-contrast saturation complements your undertone, creating vibrant daylight presence.</div>
+            </div>
+            <div>
+              <div class="metric-col-title">Proportions & Silhouette</div>
+              <div id="metricSilhouetteNote" class="metric-col-desc">Clean vertical silhouette maintains shoulder drape and balanced torso proportions.</div>
+            </div>
+            <div>
+              <div class="metric-col-title">Feature Framing</div>
+              <div id="metricFeatureNote" class="metric-col-desc">Collar structure complements jawline contours and transitions naturally to lower layers.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Looks Editorial 2x2 Grid -->
+        <div id="looksEditorialGrid" class="looks-editorial-grid">
+          <!-- Populated dynamically -->
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================================================
+         SAVED RESULTS VIEW ("YOUR STYLE ARCHIVE")
+         ======================================================================== -->
+    <section id="savedSection">
+      <div class="archive-header">
+        <h2 class="section-headline">YOUR STYLE ARCHIVE</h2>
+        <p class="section-subtitle">Looks you've created and saved to your personal wardrobe collection.</p>
+      </div>
+
+      <div id="archiveContent">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         PROFILE VIEW — MINIMAL
+         ======================================================================== -->
+    <section id="profileSection">
+      <div class="archive-header" style="text-align: center;">
+        <h2 class="section-headline">PROFILE</h2>
+        <p class="section-subtitle">Your personal styling account & wardrobe preferences.</p>
+      </div>
+
+      <div id="profileContent">
+        <!-- Dynamically rendered: Member details or Guest invitation -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       AUTH MODAL (SIGN IN / SIGN UP)
+       ======================================================================== -->
+  <div id="authModal" class="modal-overlay" onclick="closeAuthModal(event)" style="display: none;">
+    <div class="modal-container auth-modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close-icon" onclick="closeAuthModal()">&times;</button>
+      
+      <div class="auth-eyebrow">AI STYLIST MEMBERSHIP</div>
+      <h3 class="auth-modal-title" id="authModalHeading">Sign In</h3>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="tabBtnSignIn" onclick="switchAuthTab('signin')">SIGN IN</button>
+        <button type="button" class="auth-tab-btn" id="tabBtnSignUp" onclick="switchAuthTab('signup')">CREATE ACCOUNT</button>
+      </div>
+
+      <div id="authErrorBanner" class="auth-error-banner" style="display: none;"></div>
+
+      <!-- SIGN IN FORM -->
+      <form id="signInForm" onsubmit="handleSignInSubmit(event)">
+        <div class="auth-field">
+          <label class="auth-label" for="signInEmail">Email Address</label>
+          <input type="email" id="signInEmail" class="auth-input" placeholder="name@domain.com" required autocomplete="email" />
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="signInPassword">Password</label>
+          <input type="password" id="signInPassword" class="auth-input" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button type="submit" id="btnSubmitSignIn" class="btn-primary auth-submit-btn">SIGN IN →</button>
+
+        <div class="auth-helper-row">
+          <button type="button" class="auth-link-btn" onclick="switchAuthTab('signup')">Don't have an account? Create one</button>
+          <button type="button" class="auth-link-btn" onclick="quickFillDemoUser()">Demo auto-fill</button>
+        </div>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="signUpForm" onsubmit="handleSignUpSubmit(event)" style="display: none;">
+        <div class="auth-field">
+          <label class="auth-label" for="signUpFullName">Full Name</label>
+          <input type="text" id="signUpFullName" class="auth-input" placeholder="e.g. Alexandra Vance" required autocomplete="name" />
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="signUpEmail">Email Address</label>
+          <input type="email" id="signUpEmail" class="auth-input" placeholder="name@domain.com" required autocomplete="email" />
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="signUpPassword">Password (min. 6 characters)</label>
+          <input type="password" id="signUpPassword" class="auth-input" placeholder="••••••••" minlength="6" required autocomplete="new-password" />
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="signUpConfirmPassword">Confirm Password</label>
+          <input type="password" id="signUpConfirmPassword" class="auth-input" placeholder="••••••••" minlength="6" required autocomplete="new-password" />
+        </div>
+        <button type="submit" id="btnSubmitSignUp" class="btn-primary auth-submit-btn">CREATE ACCOUNT →</button>
+
+        <div class="auth-helper-row">
+          <button type="button" class="auth-link-btn" onclick="switchAuthTab('signin')">Already a member? Sign in</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       LIGHTBOX / LOOK DETAIL MODAL
+       ======================================================================== -->
+  <div id="lightboxModal" class="modal-overlay" onclick="closeLightbox(event)">
+    <div class="modal-container" onclick="event.stopPropagation()">
+      <button class="modal-close-icon" onclick="closeLightbox()">&times;</button>
+      <div class="modal-split-layout">
+        <div class="modal-image-col">
+          <img id="modalImg" src="" alt="Look Enlarged View" />
+        </div>
+        <div class="modal-info-col">
+          <div>
+            <div class="modal-eyebrow" id="modalLookNumber">LOOK 01</div>
+            <h3 class="modal-look-title" id="modalLookTitle">Clean Casual</h3>
+            <p class="modal-look-desc" id="modalLookDesc"></p>
+
+            <span class="pieces-header-label">Pieces & Fabrics</span>
+            <div id="modalPiecesList" style="margin-bottom: 24px;"></div>
+
+            <div class="fabric-harmony-container" id="modalHarmonyBox" style="display: none;">
+              <div class="fabric-harmony-lead">Fabric Harmony</div>
+              <div class="fabric-harmony-quote" id="modalHarmonyText"></div>
+            </div>
+          </div>
+          <div style="margin-top: 24px;">
+            <button class="btn-secondary" onclick="closeLightbox()">CLOSE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toastPill" class="toast-pill">
+    <span id="toastText">Action completed</span>
+  </div>
+
+  <!-- ========================================================================
+       APPLICATION LOGIC & API INTEGRATION
+       ======================================================================== -->
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000';
+    let currentUser = null;
+    let authToken = localStorage.getItem('ai_stylist_token') || null;
+    let _pendingAuthAction = null;
+
+    let userImageFile = null;
+    let garmentImageFile = null;
+    let currentAnalysisData = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await checkSession();
+    });
+
+    // -------------------------------------------------------------------------
+    // Navigation Routing
+    // -------------------------------------------------------------------------
+    function navigateTo(tabName) {
+      document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+      const homeSec = document.getElementById('homeSection');
+      const tryonSec = document.getElementById('tryonSection');
+      const savedSec = document.getElementById('savedSection');
+      const profileSec = document.getElementById('profileSection');
+
+      homeSec.style.display = 'none';
+      tryonSec.style.display = 'none';
+      savedSec.style.display = 'none';
+      profileSec.style.display = 'none';
+
+      if (tabName === 'home') {
+        homeSec.style.display = 'block';
+        document.getElementById('navHome').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tabName === 'tryon') {
+        tryonSec.style.display = 'block';
+        document.getElementById('navTryon').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tabName === 'saved') {
+        savedSec.style.display = 'block';
+        document.getElementById('navSaved').classList.add('active');
+        loadSavedWardrobe();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tabName === 'profile') {
+        profileSec.style.display = 'block';
+        document.getElementById('navProfile').classList.add('active');
+        updateProfileUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Authentication & Session Management
+    // -------------------------------------------------------------------------
+    async function checkSession() {
+      if (authToken) {
+        try {
+          const resp = await fetch(`${API_BASE}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+          if (resp.ok) {
+            currentUser = await resp.json();
+            updateUserUI();
+            fetchSavedWardrobeCount();
+            return authToken;
+          }
+        } catch (e) {
+          console.warn('Session verification error:', e);
+        }
+      }
+
+      // Guest / unauthenticated fallback
+      authToken = null;
+      currentUser = null;
+      localStorage.removeItem('ai_stylist_token');
+      updateUserUI();
+      return null;
+    }
+
+    async function ensureAuthenticated(actionCallback = null) {
+      if (authToken && currentUser) {
+        return authToken;
+      }
+      openAuthModal('signin', actionCallback);
+      return null;
+    }
+
+    function updateUserUI() {
+      const container = document.getElementById('navActionsContainer');
+      if (!container) return;
+
+      if (currentUser) {
+        const displayName = currentUser.full_name || 'Member';
+        container.innerHTML = `
+          <button type="button" class="nav-user-badge" onclick="navigateTo('profile')" title="View Account Profile">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>${displayName}</span>
+          </button>
+          <button type="button" class="nav-btn-signin" onclick="signOut()">SIGN OUT</button>
+        `;
+      } else {
+        container.innerHTML = `
+          <button type="button" class="nav-btn-signin" onclick="openAuthModal('signin')">SIGN IN</button>
+          <button type="button" class="btn-primary nav-btn-join" onclick="openAuthModal('signup')">JOIN</button>
+        `;
+      }
+    }
+
+    function updateProfileUI() {
+      const container = document.getElementById('profileContent');
+      if (!container) return;
+
+      if (currentUser) {
+        const joinDate = currentUser.created_at ? new Date(currentUser.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Verified Member';
+        container.innerHTML = `
+          <div class="profile-group">
+            <div class="profile-group-title">Personal Details</div>
+            <div class="profile-row">
+              <span class="profile-label">Full Name</span>
+              <span class="profile-value">${currentUser.full_name}</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">Email</span>
+              <span class="profile-value">${currentUser.email}</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">Member Since</span>
+              <span class="profile-value">${joinDate}</span>
+            </div>
+          </div>
+
+          <div class="profile-group">
+            <div class="profile-group-title">Style Preferences</div>
+            <div class="profile-row">
+              <span class="profile-label">Preferred Aesthetic</span>
+              <span class="profile-value">Elevated Minimalist, Tailored Silhouette</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">Color Harmony Palette</span>
+              <span class="profile-value">High Contrast, Deep Indigo, Earth Tones</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">Proportions Calibration</span>
+              <span class="profile-value">Balanced Shoulder Drape & Vertical Line</span>
+            </div>
+          </div>
+
+          <div class="profile-group">
+            <div class="profile-group-title">Account & Services</div>
+            <div class="profile-row">
+              <span class="profile-label">Wardrobe Archive</span>
+              <span class="profile-value" id="profileSavedCount">Checking...</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">Virtual Try-On Model</span>
+              <span class="profile-value">Local FASHN VTON v1.5 (NVIDIA GPU Acceleration)</span>
+            </div>
+            <div class="profile-row" style="border-bottom: none; margin-top: 24px;">
+              <button class="btn-secondary" onclick="signOut()" style="padding: 12px 28px; font-size: 0.78rem;">SIGN OUT</button>
+            </div>
+          </div>
+        `;
+        fetchSavedWardrobeCount();
+      } else {
+        container.innerHTML = `
+          <div class="archive-empty-state" style="margin-top: 20px;">
+            <h3 class="empty-state-title">MEMBER ACCESS</h3>
+            <p class="empty-state-text">Sign in or create a member account to personalize your styling preferences, save generated looks, and manage your private wardrobe archive.</p>
+            <div style="display: flex; gap: 14px; justify-content: center; margin-top: 24px; flex-wrap: wrap;">
+              <button class="btn-primary" onclick="openAuthModal('signin', () => { navigateTo('profile'); })">SIGN IN</button>
+              <button class="btn-secondary" onclick="openAuthModal('signup', () => { navigateTo('profile'); })">CREATE ACCOUNT</button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function signOut() {
+      localStorage.removeItem('ai_stylist_token');
+      authToken = null;
+      currentUser = null;
+      updateUserUI();
+      showToast('Signed out of session');
+      const profileSec = document.getElementById('profileSection');
+      if (profileSec && profileSec.style.display !== 'none') {
+        updateProfileUI();
+      }
+      const savedSec = document.getElementById('savedSection');
+      if (savedSec && savedSec.style.display !== 'none') {
+        loadSavedWardrobe();
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Auth Modal Handlers (Sign In & Sign Up)
+    // -------------------------------------------------------------------------
+    function openAuthModal(tab = 'signin', pendingAction = null) {
+      _pendingAuthAction = pendingAction || null;
+      document.getElementById('authErrorBanner').style.display = 'none';
+      document.getElementById('authErrorBanner').textContent = '';
+      switchAuthTab(tab);
+      document.getElementById('authModal').style.display = 'flex';
+    }
+
+    function closeAuthModal(e) {
+      if (e && e.target !== document.getElementById('authModal') && !e.target.classList.contains('modal-close-icon')) {
+        return;
+      }
+      document.getElementById('authModal').style.display = 'none';
+      document.getElementById('authErrorBanner').style.display = 'none';
+    }
+
+    function switchAuthTab(tab) {
+      const tabSignIn = document.getElementById('tabBtnSignIn');
+      const tabSignUp = document.getElementById('tabBtnSignUp');
+      const formSignIn = document.getElementById('signInForm');
+      const formSignUp = document.getElementById('signUpForm');
+      const heading = document.getElementById('authModalHeading');
+      const banner = document.getElementById('authErrorBanner');
+      banner.style.display = 'none';
+
+      if (tab === 'signup') {
+        tabSignUp.classList.add('active');
+        tabSignIn.classList.remove('active');
+        formSignUp.style.display = 'block';
+        formSignIn.style.display = 'none';
+        heading.textContent = 'Create Account';
+      } else {
+        tabSignIn.classList.add('active');
+        tabSignUp.classList.remove('active');
+        formSignIn.style.display = 'block';
+        formSignUp.style.display = 'none';
+        heading.textContent = 'Sign In';
+      }
+    }
+
+    async function handleSignInSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('signInEmail').value.trim();
+      const password = document.getElementById('signInPassword').value;
+      const banner = document.getElementById('authErrorBanner');
+      const btn = document.getElementById('btnSubmitSignIn');
+
+      banner.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'AUTHENTICATING...';
+
+      try {
+        const resp = await fetch(`${API_BASE}/auth/signin`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await resp.json();
+        if (!resp.ok) {
+          banner.textContent = data.detail || 'Invalid email or password. Please verify your details.';
+          banner.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'SIGN IN →';
+          return;
+        }
+
+        authToken = data.access_token;
+        localStorage.setItem('ai_stylist_token', authToken);
+        currentUser = data.user;
+
+        updateUserUI();
+        document.getElementById('authModal').style.display = 'none';
+        showToast(`Welcome back, ${currentUser.full_name}`);
+        fetchSavedWardrobeCount();
+
+        if (document.getElementById('profileSection').style.display !== 'none') {
+          updateProfileUI();
+        }
+        if (document.getElementById('savedSection').style.display !== 'none') {
+          loadSavedWardrobe();
+        }
+
+        if (_pendingAuthAction) {
+          const action = _pendingAuthAction;
+          _pendingAuthAction = null;
+          action();
+        }
+      } catch (err) {
+        banner.textContent = 'Could not connect to authentication service. Please retry.';
+        banner.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'SIGN IN →';
+      }
+    }
+
+    async function handleSignUpSubmit(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('signUpFullName').value.trim();
+      const email = document.getElementById('signUpEmail').value.trim();
+      const password = document.getElementById('signUpPassword').value;
+      const confirmPassword = document.getElementById('signUpConfirmPassword').value;
+      const banner = document.getElementById('authErrorBanner');
+      const btn = document.getElementById('btnSubmitSignUp');
+
+      banner.style.display = 'none';
+
+      if (password !== confirmPassword) {
+        banner.textContent = 'Passwords do not match. Please verify and retry.';
+        banner.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'CREATING ACCOUNT...';
+
+      try {
+        const resp = await fetch(`${API_BASE}/auth/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            full_name: fullName,
+            email: email,
+            password: password,
+            confirm_password: confirmPassword
+          })
+        });
+
+        const data = await resp.json();
+        if (!resp.ok) {
+          let errMsg = data.detail;
+          if (Array.isArray(errMsg)) {
+            errMsg = errMsg.map(item => item.msg).join(', ');
+          }
+          banner.textContent = errMsg || 'Could not register account with provided information.';
+          banner.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'CREATE ACCOUNT →';
+          return;
+        }
+
+        authToken = data.access_token;
+        localStorage.setItem('ai_stylist_token', authToken);
+        currentUser = data.user;
+
+        updateUserUI();
+        document.getElementById('authModal').style.display = 'none';
+        showToast(`Welcome to AI Stylist, ${currentUser.full_name}`);
+        fetchSavedWardrobeCount();
+
+        if (document.getElementById('profileSection').style.display !== 'none') {
+          updateProfileUI();
+        }
+        if (document.getElementById('savedSection').style.display !== 'none') {
+          loadSavedWardrobe();
+        }
+
+        if (_pendingAuthAction) {
+          const action = _pendingAuthAction;
+          _pendingAuthAction = null;
+          action();
+        }
+      } catch (err) {
+        banner.textContent = 'Could not connect to registration service. Please retry.';
+        banner.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'CREATE ACCOUNT →';
+      }
+    }
+
+    function quickFillDemoUser() {
+      document.getElementById('signInEmail').value = 'editorial@aistylist.com';
+      document.getElementById('signInPassword').value = 'StylistPass123!';
+      showToast('Filled sample member credentials');
+    }
+
+    // -------------------------------------------------------------------------
+    // Upload Handlers
+    // -------------------------------------------------------------------------
+    function handleUserPhotoSelected(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      userImageFile = file;
+      renderImagePreview(file, 'userImgPreview', 'userEmptyContent', 'userActionsBar', 'userDropzone');
+      showToast('Portrait photo uploaded');
+    }
+
+    function handleGarmentPhotoSelected(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      garmentImageFile = file;
+      renderImagePreview(file, 'garmentImgPreview', 'garmentEmptyContent', 'garmentActionsBar', 'garmentDropzone');
+      showToast('Garment piece uploaded');
+    }
+
+    function renderImagePreview(file, imgId, emptyId, actionsId, dropzoneId) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.getElementById(imgId);
+        img.src = e.target.result;
+        img.style.display = 'block';
+        document.getElementById(emptyId).style.display = 'none';
+        document.getElementById(actionsId).style.display = 'flex';
+        document.getElementById(dropzoneId).classList.add('has-image');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearUserPhoto() {
+      userImageFile = null;
+      document.getElementById('userInputFile').value = '';
+      document.getElementById('userImgPreview').style.display = 'none';
+      document.getElementById('userEmptyContent').style.display = 'block';
+      document.getElementById('userActionsBar').style.display = 'none';
+      document.getElementById('userDropzone').classList.remove('has-image');
+      showToast('Portrait removed');
+    }
+
+    function clearGarmentPhoto() {
+      garmentImageFile = null;
+      document.getElementById('garmentInputFile').value = '';
+      document.getElementById('garmentImgPreview').style.display = 'none';
+      document.getElementById('garmentEmptyContent').style.display = 'block';
+      document.getElementById('garmentActionsBar').style.display = 'none';
+      document.getElementById('garmentDropzone').classList.remove('has-image');
+      showToast('Garment removed');
+    }
+
+    // Quick Sample Triggers
+    async function loadDemoPortrait() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 500;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#f3f4f6';
+      ctx.fillRect(0, 0, 400, 500);
+
+      // Simple studio portrait representation
+      ctx.fillStyle = '#d4a373';
+      ctx.beginPath();
+      ctx.ellipse(200, 190, 75, 95, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#2b2d42';
+      ctx.beginPath();
+      ctx.arc(200, 160, 80, Math.PI * 0.8, Math.PI * 2.2);
+      ctx.fill();
+
+      ctx.fillStyle = '#1f2937';
+      ctx.beginPath();
+      ctx.ellipse(200, 390, 140, 100, 0, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      canvas.toBlob((blob) => {
+        const file = new File([blob], 'demo_portrait.jpg', { type: 'image/jpeg' });
+        userImageFile = file;
+        renderImagePreview(file, 'userImgPreview', 'userEmptyContent', 'userActionsBar', 'userDropzone');
+        showToast('Studio portrait loaded');
+      }, 'image/jpeg');
+    }
+
+    async function loadDemoBlueTee() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 400;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, 400, 400);
+
+      // Royal Blue T-shirt (#4169E2)
+      ctx.fillStyle = '#4169E2';
+      ctx.beginPath();
+      ctx.roundRect(110, 120, 180, 220, 6);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(110, 120);
+      ctx.lineTo(40, 190);
+      ctx.lineTo(80, 220);
+      ctx.lineTo(110, 180);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(290, 120);
+      ctx.lineTo(360, 190);
+      ctx.lineTo(320, 220);
+      ctx.lineTo(290, 180);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.ellipse(200, 120, 45, 24, 0, 0, Math.PI);
+      ctx.fill();
+
+      canvas.toBlob((blob) => {
+        const file = new File([blob], 'demo_royal_blue_tee.jpg', { type: 'image/jpeg' });
+        garmentImageFile = file;
+        renderImagePreview(file, 'garmentImgPreview', 'garmentEmptyContent', 'garmentActionsBar', 'garmentDropzone');
+        document.getElementById('categorySelect').value = 'T-shirt';
+        showToast('Royal Blue T-Shirt loaded');
+      }, 'image/jpeg');
+    }
+
+    // -------------------------------------------------------------------------
+    // Execution: Call /analyze
+    // -------------------------------------------------------------------------
+    async function executeTryOnAnalysis() {
+      if (!garmentImageFile) {
+        showToast('Please upload a garment first');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitAnalysis');
+      const progressBox = document.getElementById('analysisProgressBox');
+      const resultsSec = document.getElementById('resultsSection');
+
+      btn.disabled = true;
+      progressBox.style.display = 'block';
+      resultsSec.style.display = 'none';
+
+      const markerG = document.getElementById('markerGarment');
+      const markerC = document.getElementById('markerColours');
+      const markerL = document.getElementById('markerLooks');
+      const markerT = document.getElementById('markerTryon');
+
+      markerG.textContent = '•';
+      markerC.textContent = '•';
+      markerL.textContent = '•';
+      markerT.textContent = '•';
+
+      setTimeout(() => { markerG.textContent = '✓'; }, 1000);
+      setTimeout(() => { markerC.textContent = '✓'; }, 2000);
+      setTimeout(() => { markerL.textContent = '✓'; }, 3200);
+
+      try {
+        if (!authToken) {
+          await ensureAuthenticated();
+        }
+
+        const formData = new FormData();
+        formData.append('clothing_image', garmentImageFile);
+        if (userImageFile) {
+          formData.append('user_image', userImageFile);
+        }
+        formData.append('clothing_category_hint', document.getElementById('categorySelect').value);
+
+        let headers = {};
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`;
+        }
+
+        let resp = await fetch(`${API_BASE}/analyze`, {
+          method: 'POST',
+          headers: headers,
+          body: formData
+        });
+
+        if (resp.status === 401) {
+          authToken = null;
+          localStorage.removeItem('ai_stylist_token');
+          await ensureAuthenticated();
+          if (authToken) {
+            headers['Authorization'] = `Bearer ${authToken}`;
+            resp = await fetch(`${API_BASE}/analyze`, {
+              method: 'POST',
+              headers: headers,
+              body: formData
+            });
+          }
+        }
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.detail || 'Analysis request failed.');
+        }
+
+        markerT.textContent = '✓';
+        const data = await resp.json();
+        currentAnalysisData = data;
+        renderResults(data);
+        showToast('4 looks styled successfully');
+      } catch (err) {
+        console.error('Styling analysis error:', err);
+        showToast(err.message || 'Something went wrong. Please try again.');
+      } finally {
+        btn.disabled = false;
+        progressBox.style.display = 'none';
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Render Results
+    // -------------------------------------------------------------------------
+    function renderResults(data) {
+      const resultsSec = document.getElementById('resultsSection');
+      resultsSec.style.display = 'block';
+
+      // 1. Garment Detected Tag & Color
+      document.getElementById('resultsSwatchBox').style.backgroundColor = data.hex_value || '#4169E2';
+      document.getElementById('resultsGarmentLabel').textContent = `${data.colour_shade || data.detected_colour} ${data.clothing_type}`.toUpperCase();
+
+      // 2. Style Analysis Summary
+      const pa = data.personalized_analysis || {};
+      const quoteEl = document.getElementById('analysisQuoteText');
+      if (pa.how_it_works_with_you) {
+        quoteEl.textContent = `"${pa.how_it_works_with_you}"`;
+      } else {
+        quoteEl.textContent = `"The ${data.colour_shade} tone provides distinct visual contrast with your undertones, creating an intentional focal anchor for complete outfits."`;
+      }
+
+      if (pa.complexion_harmony) {
+        document.getElementById('metricColorNote').textContent = pa.complexion_harmony;
+      }
+      if (pa.silhouette_advice) {
+        document.getElementById('metricSilhouetteNote').textContent = pa.silhouette_advice;
+      }
+
+      // 3. 4 Looks Grid
+      const grid = document.getElementById('looksEditorialGrid');
+      grid.innerHTML = '';
+
+      const looks = data.outfit_suggestions || [];
+      looks.forEach((look, index) => {
+        const isActualTryOn = (index < 2) && look.image_url && (look.result_type === 'actual_try_on' || look.try_on_type === 'actual_try_on');
+        const fullImgUrl = look.image_url ? (look.image_url.startsWith('http') ? look.image_url : `${API_BASE}${look.image_url}`) : '';
+
+        const lookNumStr = `LOOK 0${look.look_id || index + 1}`;
+        const topText = look.top || `${data.colour_shade || data.detected_colour} ${data.clothing_type}`;
+        const topMat = (look.top_detail && look.top_detail.material) || '';
+
+        let bottomText = '';
+        let bottomMat = '';
+        if (typeof look.bottom === 'object' && look.bottom !== null) {
+          const col = look.bottom.color || '';
+          const itm = look.bottom.item || '';
+          bottomText = col ? `${col} ${itm}` : itm;
+          bottomMat = look.bottom.material || '';
+        } else {
+          bottomText = look.bottom || 'Complementary Trousers';
+        }
+
+        let shoesText = '';
+        let shoesMat = '';
+        if (typeof look.shoes === 'object' && look.shoes !== null) {
+          const col = look.shoes.color || '';
+          const itm = look.shoes.item || '';
+          shoesText = col ? `${col} ${itm}` : itm;
+          shoesMat = look.shoes.material || '';
+        } else {
+          shoesText = look.shoes || 'Matching Footwear';
+        }
+
+        let layerText = '';
+        let layerMat = '';
+        if (look.layer && look.layer !== 'None') {
+          if (typeof look.layer === 'object') {
+            const col = look.layer.color && look.layer.color !== 'None' ? `${look.layer.color} ` : '';
+            const itm = look.layer.item && look.layer.item !== 'None' ? look.layer.item : '';
+            layerText = `${col}${itm}`.trim();
+            layerMat = look.layer.material && look.layer.material !== 'None' ? look.layer.material : '';
+          } else {
+            layerText = look.layer;
+          }
+        }
+
+        let accText = '';
+        if (Array.isArray(look.accessories)) {
+          accText = look.accessories.join(' • ');
+        } else if (look.accessories && look.accessories !== 'None') {
+          accText = look.accessories;
+        }
+
+        // Card Visual Stage: High-res Try-On Photo (Looks 1 & 2) vs Refined Moodboard (Looks 3 & 4)
+        let visualStageHtml = '';
+        if (isActualTryOn) {
+          visualStageHtml = `
+            <div class="look-image-stage" onclick="openLightbox(${index})">
+              <img src="${fullImgUrl}" alt="${look.title}" onerror="this.src='https://placehold.co/800x1000/F7F7F5/111111?text=Virtual+Try-On'" />
+              <div class="image-hover-cue">VIEW LOOK →</div>
+            </div>
+          `;
+        } else {
+          const paletteHtml = (look.palette || []).map(p => `
+            <div class="palette-box-item">
+              <div class="palette-swatch-rect" style="background-color: ${p.hex || '#111111'};"></div>
+              <div class="palette-name-text">${p.name || 'Tone'}</div>
+              <div class="palette-role-text">${p.role || 'Accent'}</div>
+            </div>
+          `).join('');
+
+          visualStageHtml = `
+            <div class="moodboard-stage">
+              <div>
+                <h4 class="moodboard-stage-title">OUTFIT & FABRIC DIRECTION</h4>
+                <p class="moodboard-stage-desc">Calibrated color blocking and tactile material textures</p>
+                ${paletteHtml ? `<div class="palette-row-boxes">${paletteHtml}</div>` : ''}
+              </div>
+              <div class="fabric-pills-row">
+                ${topMat ? `<span class="fabric-spec-tag">TOP: ${topMat.toUpperCase()}</span>` : ''}
+                ${bottomMat ? `<span class="fabric-spec-tag">BOTTOM: ${bottomMat.toUpperCase()}</span>` : ''}
+                ${shoesMat ? `<span class="fabric-spec-tag">FOOTWEAR: ${shoesMat.toUpperCase()}</span>` : ''}
+                ${layerMat ? `<span class="fabric-spec-tag">LAYER: ${layerMat.toUpperCase()}</span>` : ''}
+              </div>
+            </div>
+          `;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'look-editorial-card';
+
+        card.innerHTML = `
+          <div class="look-card-header">
+            <span class="look-number-label">${lookNumStr}</span>
+            <span class="look-badge ${isActualTryOn ? 'actual-tryon' : 'guide-mode'}">
+              ${isActualTryOn ? 'ACTUAL TRY-ON (FASHN VTON)' : 'OUTFIT & MATERIAL GUIDE'}
+            </span>
+          </div>
+
+          ${visualStageHtml}
+
+          <div class="look-body-details">
+            <h3 class="look-direction-title">${look.title}</h3>
+            <div class="look-meta-line">${look.style || 'Clean Casual'} &nbsp;•&nbsp; ${look.occasion || 'Everyday'}</div>
+
+            <p class="look-desc-text">${look.explanation || look.description || ''}</p>
+
+            <span class="pieces-header-label">Complete Ensemble Pieces</span>
+            
+            <div class="piece-item-row">
+              <span class="piece-item-category">Original Piece</span>
+              <span class="piece-item-desc">
+                <strong>${topText}</strong>
+                ${topMat ? `<span class="piece-material-sub">• ${topMat}</span>` : ''}
+              </span>
+            </div>
+
+            <div class="piece-item-row">
+              <span class="piece-item-category">Bottom</span>
+              <span class="piece-item-desc">
+                <strong>${bottomText}</strong>
+                ${bottomMat ? `<span class="piece-material-sub">• ${bottomMat}</span>` : ''}
+              </span>
+            </div>
+
+            <div class="piece-item-row">
+              <span class="piece-item-category">Footwear</span>
+              <span class="piece-item-desc">
+                <strong>${shoesText}</strong>
+                ${shoesMat ? `<span class="piece-material-sub">• ${shoesMat}</span>` : ''}
+              </span>
+            </div>
+
+            ${layerText ? `
+            <div class="piece-item-row">
+              <span class="piece-item-category">Layer / Jacket</span>
+              <span class="piece-item-desc">
+                <strong>${layerText}</strong>
+                ${layerMat ? `<span class="piece-material-sub">• ${layerMat}</span>` : ''}
+              </span>
+            </div>` : ''}
+
+            ${accText ? `
+            <div class="piece-item-row">
+              <span class="piece-item-category">Accessories</span>
+              <span class="piece-item-desc">${accText}</span>
+            </div>` : ''}
+
+            ${look.fabric_harmony ? `
+            <div class="fabric-harmony-container">
+              <div class="fabric-harmony-lead">Fabric Harmony & Drape</div>
+              <div class="fabric-harmony-quote">${look.fabric_harmony}</div>
+            </div>` : ''}
+
+            <div class="look-card-bottom">
+              <button class="btn-secondary" id="saveBtn_${index}" onclick="saveSpecificLook(${index})">
+                SAVE TO ARCHIVE
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      resultsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // -------------------------------------------------------------------------
+    // Lightbox / Look Detail Modal
+    // -------------------------------------------------------------------------
+    function openLightbox(lookIndex) {
+      if (!currentAnalysisData) return;
+      const look = currentAnalysisData.outfit_suggestions[lookIndex];
+      const fullImgUrl = look.image_url ? (look.image_url.startsWith('http') ? look.image_url : `${API_BASE}${look.image_url}`) : '';
+
+      document.getElementById('modalImg').src = fullImgUrl;
+      document.getElementById('modalLookNumber').textContent = `LOOK 0${look.look_id || lookIndex + 1}`;
+      document.getElementById('modalLookTitle').textContent = look.title;
+      document.getElementById('modalLookDesc').textContent = look.explanation || look.description || '';
+
+      const piecesContainer = document.getElementById('modalPiecesList');
+      let pieces = [];
+
+      const topMat = (look.top_detail && look.top_detail.material) ? ` (${look.top_detail.material})` : '';
+      pieces.push({ cat: 'Piece', desc: `${look.top}${topMat}` });
+
+      if (look.bottom) {
+        const bText = typeof look.bottom === 'object' ? `${look.bottom.color || ''} ${look.bottom.item || ''}`.trim() : look.bottom;
+        const bMat = (typeof look.bottom === 'object' && look.bottom.material) ? ` (${look.bottom.material})` : '';
+        pieces.push({ cat: 'Bottom', desc: `${bText}${bMat}` });
+      }
+
+      if (look.shoes) {
+        const sText = typeof look.shoes === 'object' ? `${look.shoes.color || ''} ${look.shoes.item || ''}`.trim() : look.shoes;
+        const sMat = (typeof look.shoes === 'object' && look.shoes.material) ? ` (${look.shoes.material})` : '';
+        pieces.push({ cat: 'Footwear', desc: `${sText}${sMat}` });
+      }
+
+      if (look.layer && look.layer !== 'None') {
+        const lText = typeof look.layer === 'object' ? `${look.layer.color || ''} ${look.layer.item || ''}`.trim() : look.layer;
+        const lMat = (typeof look.layer === 'object' && look.layer.material && look.layer.material !== 'None') ? ` (${look.layer.material})` : '';
+        if (lText) pieces.push({ cat: 'Layer', desc: `${lText}${lMat}` });
+      }
+
+      if (look.accessories && look.accessories !== 'None') {
+        const aText = Array.isArray(look.accessories) ? look.accessories.join(', ') : look.accessories;
+        if (aText) pieces.push({ cat: 'Acc.', desc: aText });
+      }
+
+      piecesContainer.innerHTML = pieces.map(p => `
+        <div class="piece-item-row" style="padding: 8px 0;">
+          <span class="piece-item-category">${p.cat}</span>
+          <span class="piece-item-desc"><strong>${p.desc}</strong></span>
+        </div>
+      `).join('');
+
+      const harmBox = document.getElementById('modalHarmonyBox');
+      if (look.fabric_harmony) {
+        harmBox.style.display = 'block';
+        document.getElementById('modalHarmonyText').textContent = look.fabric_harmony;
+      } else {
+        harmBox.style.display = 'none';
+      }
+
+      document.getElementById('lightboxModal').style.display = 'flex';
+    }
+
+    function closeLightbox(e) {
+      if (e && e.target !== document.getElementById('lightboxModal') && !e.target.classList.contains('modal-close-icon')) {
+        return;
+      }
+      document.getElementById('lightboxModal').style.display = 'none';
+    }
+
+    // -------------------------------------------------------------------------
+    // Saved Wardrobe Archive
+    // -------------------------------------------------------------------------
+    async function saveSpecificLook(lookIndex) {
+      if (!currentAnalysisData) return;
+      if (!authToken || !currentUser) {
+        showToast('Please sign in to save looks');
+        openAuthModal('signin', () => saveSpecificLook(lookIndex));
+        return;
+      }
+
+      const look = currentAnalysisData.outfit_suggestions[lookIndex];
+      const btn = document.getElementById(`saveBtn_${lookIndex}`);
+
+      const payload = {
+        clothing_image: currentAnalysisData.clothing_image_url || '',
+        clothing_image_url: currentAnalysisData.clothing_image_url || '',
+        user_image: currentAnalysisData.user_image_url || null,
+        user_image_url: currentAnalysisData.user_image_url || null,
+        clothing_type: currentAnalysisData.clothing_type,
+        detected_colour: currentAnalysisData.detected_colour,
+        colour_shade: currentAnalysisData.colour_shade,
+        hex_value: currentAnalysisData.hex_value,
+        rgb_value: currentAnalysisData.rgb_value,
+        confidence: currentAnalysisData.confidence,
+        recommendations: currentAnalysisData.recommended_colours || [],
+        recommended_colours: currentAnalysisData.recommended_colours || [],
+        outfit_suggestions: [look],
+        explanations: look.personalization_reason || currentAnalysisData.overall_advice || 'Personalized try-on look',
+      };
+
+      try {
+        const resp = await fetch(`${API_BASE}/saved-results`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (resp.ok) {
+          btn.textContent = 'SAVED ✓';
+          btn.disabled = true;
+          showToast(`Saved "${look.title}" to Archive`);
+          fetchSavedWardrobeCount();
+        } else {
+          showToast('Could not save look.');
+        }
+      } catch (err) {
+        showToast('Save failed.');
+      }
+    }
+
+    async function fetchSavedWardrobeCount() {
+      if (!authToken || !currentUser) {
+        const el = document.getElementById('profileSavedCount');
+        if (el) el.textContent = '0 Looks';
+        return;
+      }
+      try {
+        const resp = await fetch(`${API_BASE}/saved-results`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (resp.ok) {
+          const items = await resp.json();
+          const el = document.getElementById('profileSavedCount');
+          if (el) el.textContent = `${items.length} Looks`;
+        }
+      } catch (e) {}
+    }
+
+    async function loadSavedWardrobe() {
+      const container = document.getElementById('archiveContent');
+      if (!authToken || !currentUser) {
+        container.innerHTML = `
+          <div class="archive-empty-state">
+            <h3 class="empty-state-title">SIGN IN TO ACCESS ARCHIVE</h3>
+            <p class="empty-state-text">Your personal saved wardrobe collection is linked to your private membership account.</p>
+            <div style="display: flex; gap: 14px; justify-content: center; margin-top: 24px; flex-wrap: wrap;">
+              <button class="btn-primary" onclick="openAuthModal('signin', () => loadSavedWardrobe())">SIGN IN</button>
+              <button class="btn-secondary" onclick="openAuthModal('signup', () => loadSavedWardrobe())">CREATE ACCOUNT</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-muted);">Accessing style archive...</div>';
+
+      try {
+        const resp = await fetch(`${API_BASE}/saved-results`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!resp.ok) throw new Error('Could not load archive');
+        const items = await resp.json();
+
+        if (items.length === 0) {
+          container.innerHTML = `
+            <div class="archive-empty-state">
+              <h3 class="empty-state-title">YOUR STYLE ARCHIVE</h3>
+              <p class="empty-state-text">Your saved looks will appear here.</p>
+              <button class="btn-text" onclick="navigateTo('tryon')">CREATE YOUR FIRST LOOK →</button>
+            </div>
+          `;
+          return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'archive-grid';
+
+        items.forEach(item => {
+          const outfit = (item.outfit_suggestions && item.outfit_suggestions[0]) || {};
+          const fullImgUrl = outfit.image_url ? (outfit.image_url.startsWith('http') ? outfit.image_url : `${API_BASE}${outfit.image_url}`) : (item.clothing_image_url ? (item.clothing_image_url.startsWith('http') ? item.clothing_image_url : `${API_BASE}${item.clothing_image_url}`) : '');
+          const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'ARCHIVE';
+
+          const card = document.createElement('div');
+          card.className = 'archive-card';
+          card.innerHTML = `
+            <div class="archive-img-wrap">
+              <img src="${fullImgUrl}" alt="${outfit.title || item.clothing_type}" onerror="this.src='https://placehold.co/800x1000/F7F7F5/111111?text=Archive+Look'" />
+            </div>
+            <div class="archive-card-details">
+              <h4 class="archive-title">${outfit.title || `${item.colour_shade} ${item.clothing_type}`}</h4>
+              <div class="archive-meta">${item.clothing_type} &nbsp;•&nbsp; ${dateStr}</div>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                ${outfit.explanation || item.explanations || ''}
+              </p>
+              <div style="margin-top: auto; display: flex; justify-content: flex-end;">
+                <button class="btn-action-minimal" onclick="deleteSavedItem(${item.id})">DELETE</button>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(grid);
+      } catch (err) {
+        container.innerHTML = `<div style="text-align: center; padding: 60px; color: var(--text-muted);">Failed to load archive: ${err.message}</div>`;
+      }
+    }
+
+    async function deleteSavedItem(id) {
+      if (!confirm('Remove this look from your style archive?')) return;
+      try {
+        const resp = await fetch(`${API_BASE}/saved-results/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (resp.ok) {
+          showToast('Look removed from archive');
+          loadSavedWardrobe();
+          fetchSavedWardrobeCount();
+        }
+      } catch (e) {
+        showToast('Delete failed');
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Toast Utility
+    // -------------------------------------------------------------------------
+    let toastTimeout = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toastPill');
+      document.getElementById('toastText').textContent = msg;
+      toast.style.display = 'flex';
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3200);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+# ==============================================================================
+# AI STYLIST — ROOT GITIGNORE
+# ==============================================================================
+
+# Python & Virtual Environments
+venv/
+.venv/
+*/venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Sensitive Environment & Secrets
+.env
+*.env
+!.env.example
+backend/.env
+frontend/.env
+
+# Local Databases
+*.db
+*.sqlite
+*.sqlite3
+backend/ai_stylist.db
+
+# Heavy Deep Learning Model Weights (Downloaded via backend/download_fashn_weights.py)
+backend/weights/*
+!backend/weights/.gitkeep
+*.safetensors
+*.onnx
+*.pt
+*.pth
+*.bin
+*.ckpt
+
+# User Uploads & Generated Temporary Images
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Flutter / Dart Build Caches & Artifacts
+.dart_tool/
+*/.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+frontend/build/*.dill
+frontend/build/*.track.dill
+frontend/build/test_cache/
+frontend/build/app/
+frontend/build/ios/
+frontend/build/linux/
+frontend/build/macos/
+frontend/build/windows/
+
+# IDE & Editor Configurations
+.idea/
+*/.idea/
+.vscode/
+*/.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
