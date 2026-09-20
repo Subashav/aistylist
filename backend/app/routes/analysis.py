@@ -288,7 +288,7 @@ async def analyze_clothing(
     # 8b. Duplicate Detection
     gen_paths = []
     for s in outfit_suggestions_with_visuals:
-        if s.image_url:
+        if s.image_url and not s.image_url.startswith("data:"):
             gen_paths.append(BASE_DIR / s.image_url.lstrip("/"))
         else:
             gen_paths.append(None)

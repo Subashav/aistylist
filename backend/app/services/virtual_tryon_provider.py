@@ -24,7 +24,7 @@ import logging
 import httpx
 from PIL import Image
 
-from app.config import settings
+from app.config import settings, IS_SERVERLESS
 
 logger = logging.getLogger(__name__)
 
@@ -190,16 +190,30 @@ async def _generate_editorial_compositor_try_on(
     )
     comp_file = temp_out / Path(comp_rel).name
 
+    # Encode optimized, lightweight JPEG data URL for instant zero-roundtrip delivery
+    import cv2
+    img_bgr = cv2.imread(str(comp_file))
+    data_url = None
+    if img_bgr is not None:
+        ok, enc = cv2.imencode(".jpg", img_bgr, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        if ok:
+            b64_str = base64.b64encode(enc.tobytes()).decode("ascii")
+            data_url = f"data:image/jpeg;base64,{b64_str}"
+
     storage = get_storage_provider()
     fn = f"tryon_{uuid.uuid4().hex}.png"
     img_bytes = comp_file.read_bytes()
     final_url = await storage.save_image(img_bytes, fn, "image/png", "virtual_tryon")
     elapsed = round(time.perf_counter() - t0, 2)
 
+    # In serverless environments, deliver as data URL to guarantee zero 404s across container instances
+    delivered_url = data_url if (IS_SERVERLESS and data_url) else final_url
+
     return {
         "success": True,
         "result_type": "actual_try_on",
-        "image_url": final_url,
+        "image_url": delivered_url,
+        "try_on_image_url": delivered_url,
         "provider": "fashion_editorial_vton",
         "category": category,
         "execution_time_seconds": elapsed,

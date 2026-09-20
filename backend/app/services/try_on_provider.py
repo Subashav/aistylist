@@ -301,12 +301,12 @@ class PersonalizedTryOnCompositor:
                         tw, th = cfg["head_w"], cfg["head_h"]
                         face_resized = cv2.resize(face_crop, (tw, th), interpolation=cv2.INTER_LANCZOS4)
                         mask = np.zeros((th, tw), dtype=np.float32)
-                        cv2.ellipse(mask, (tw // 2, th // 2 - 6), (tw // 2 - 14, th // 2 - 8), 0, 0, 360, 1.0, -1)
-                        mask = cv2.GaussianBlur(mask, (25, 25), 9)
+                        cv2.ellipse(mask, (tw // 2, th // 2 - 4), (int(tw * 0.38), int(th * 0.42)), 0, 0, 360, 1.0, -1)
+                        mask = cv2.GaussianBlur(mask, (31, 31), 11)
                         mask_3ch = np.dstack([mask, mask, mask])
 
-                        px = cfg["head_cx"] - tw // 2
-                        py = cfg["head_cy"] - th // 2
+                        px = max(0, min(result.shape[1] - tw, cfg["head_cx"] - tw // 2))
+                        py = max(0, min(result.shape[0] - th, cfg["head_cy"] - th // 2))
                         roi = result[py : py + th, px : px + tw]
 
                         f_mean = np.mean(cv2.cvtColor(face_resized, cv2.COLOR_BGR2GRAY))

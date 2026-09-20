@@ -2584,6 +2584,14 @@
       return window.location.origin;
     }
     let API_BASE = getApiBase();
+
+    function resolveMediaUrl(url) {
+      if (!url) return '';
+      if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+        return url;
+      }
+      return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+    }
     let currentUser = null;
     let authToken = localStorage.getItem('ai_stylist_token') || null;
     let _pendingAuthAction = null;
@@ -3274,7 +3282,7 @@
       looks.forEach((look, index) => {
         const isActualTryOn = (index < 2) && look.image_url && (look.result_type === 'actual_try_on' || look.try_on_type === 'actual_try_on');
         const isUnavailable = (look.result_type === 'unavailable' || look.try_on_type === 'unavailable');
-        const fullImgUrl = look.image_url ? (look.image_url.startsWith('http') ? look.image_url : `${API_BASE}${look.image_url}`) : '';
+        const fullImgUrl = resolveMediaUrl(look.image_url);
 
         const lookNumStr = `LOOK 0${look.look_id || index + 1}`;
         const topText = look.top || `${data.colour_shade || data.detected_colour} ${data.clothing_type}`;
@@ -3481,7 +3489,7 @@
     function openLightbox(lookIndex) {
       if (!currentAnalysisData) return;
       const look = currentAnalysisData.outfit_suggestions[lookIndex];
-      const fullImgUrl = look.image_url ? (look.image_url.startsWith('http') ? look.image_url : `${API_BASE}${look.image_url}`) : '';
+      const fullImgUrl = resolveMediaUrl(look.image_url);
 
       document.getElementById('modalImg').src = fullImgUrl;
       document.getElementById('modalLookNumber').textContent = `LOOK 0${look.look_id || lookIndex + 1}`;
@@ -3655,7 +3663,7 @@
 
         items.forEach(item => {
           const outfit = (item.outfit_suggestions && item.outfit_suggestions[0]) || {};
-          const fullImgUrl = outfit.image_url ? (outfit.image_url.startsWith('http') ? outfit.image_url : `${API_BASE}${outfit.image_url}`) : (item.clothing_image_url ? (item.clothing_image_url.startsWith('http') ? item.clothing_image_url : `${API_BASE}${item.clothing_image_url}`) : '');
+          const fullImgUrl = resolveMediaUrl(outfit.image_url || item.clothing_image_url);
           const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'ARCHIVE';
 
           const card = document.createElement('div');
