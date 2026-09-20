@@ -17,7 +17,6 @@ import logging
 from PIL import Image
 
 from app.config import settings
-from app.services.fashn_vton_local_provider import FASHNVTONLocalProvider
 from app.services.try_on_provider import PersonalizedTryOnCompositor
 
 logger = logging.getLogger(__name__)
@@ -53,16 +52,58 @@ class VirtualTryOnProvider(ABC):
         pass
 
 
+class DisabledVirtualTryOnProvider(VirtualTryOnProvider):
+    """
+    Provider used when VTON is disabled (e.g. serverless, production web CDN, or no GPU).
+    Returns an honest, structured 'unavailable' result instead of fake try-on images.
+    """
+
+    def __init__(self):
+        self.is_ready = False
+
+    async def generate_try_on(
+        self,
+        person_image: Union[str, Path, bytes, Image.Image],
+        garment_image: Union[str, Path, bytes, Image.Image],
+        category: str,
+        styling_context: Optional[Dict[str, Any]] = None,
+        **kwargs,
+    ) -> Dict[str, Any]:
+        return {
+            "success": False,
+            "result_type": "unavailable",
+            "image_url": None,
+            "provider": "disabled",
+            "category": category,
+            "error_code": "VTON_DISABLED",
+            "message": "Virtual Try-On is disabled in this environment (requires local GPU workstation). Complete styling and material analysis remain fully functional.",
+        }
+
+
 class DefaultVirtualTryOnProvider(VirtualTryOnProvider):
     """
-    Default Phase 1 Virtual Try-On Provider.
-    Primary: FASHN VTON v1.5 local GPU execution.
+    Default Virtual Try-On Provider.
+    Primary: FASHN VTON v1.5 local GPU execution (lazy-loaded).
     Fallback: PersonalizedTryOnCompositor (clearly labeled as outfit_preview).
     """
 
-    def __init__(self, local_vton_provider: Optional[FASHNVTONLocalProvider] = None):
-        self.local_provider = local_vton_provider or FASHNVTONLocalProvider()
+    def __init__(self, local_vton_provider: Optional[Any] = None):
+        self._local_provider = local_vton_provider
         self.compositor_fallback = PersonalizedTryOnCompositor()
+
+    @property
+    def local_provider(self):
+        if self._local_provider is None:
+            if settings.VTON_PROVIDER == "disabled" or not settings.VTON_ENABLED:
+                self._local_provider = DisabledVirtualTryOnProvider()
+            else:
+                try:
+                    from app.services.fashn_vton_local_provider import FASHNVTONLocalProvider
+                    self._local_provider = FASHNVTONLocalProvider()
+                except Exception as exc:
+                    logger.warning("FASHN VTON local provider unavailable (%s); using Disabled provider.", exc)
+                    self._local_provider = DisabledVirtualTryOnProvider()
+        return self._local_provider
 
     async def generate_try_on(
         self,
@@ -74,7 +115,7 @@ class DefaultVirtualTryOnProvider(VirtualTryOnProvider):
         **kwargs,
     ) -> Dict[str, Any]:
         # 1. Attempt Local FASHN VTON
-        if settings.VTON_ENABLED:
+        if settings.VTON_ENABLED and settings.VTON_PROVIDER == "local":
             vton_res = await self.local_provider.generate_try_on(
                 person_image=person_image,
                 garment_image=garment_image,
@@ -130,11 +171,14 @@ class DefaultVirtualTryOnProvider(VirtualTryOnProvider):
 
 
 # Global singleton instance
-_vton_singleton: Optional[DefaultVirtualTryOnProvider] = None
+_vton_singleton: Optional[VirtualTryOnProvider] = None
 
 
-def get_virtual_tryon_provider() -> DefaultVirtualTryOnProvider:
+def get_virtual_tryon_provider() -> VirtualTryOnProvider:
     global _vton_singleton
     if _vton_singleton is None:
-        _vton_singleton = DefaultVirtualTryOnProvider()
+        if settings.VTON_PROVIDER == "disabled" or not settings.VTON_ENABLED:
+            _vton_singleton = DisabledVirtualTryOnProvider()
+        else:
+            _vton_singleton = DefaultVirtualTryOnProvider()
     return _vton_singleton

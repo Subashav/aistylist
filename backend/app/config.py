@@ -25,6 +25,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
+        "https://aistylist-mu.vercel.app",
     ]
     # Visual Provider Settings: 'ai' or 'pillow'
     OUTFIT_VISUAL_PROVIDER: str = "ai"
@@ -42,7 +43,8 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-3.6-flash"
     GEMINI_TIMEOUT: int = 15
 
-    # Local FASHN VTON v1.5 Settings
+    # Virtual Try-On Provider: "local" (default for Windows GPU) or "disabled"
+    VTON_PROVIDER: str = os.getenv("VTON_PROVIDER", "local")
     VTON_ENABLED: bool = True
     VTON_MODEL_NAME: str = "FASHN VTON v1.5"
     VTON_WEIGHTS_DIR: Path = (BASE_DIR / "weights").resolve()
@@ -50,9 +52,14 @@ class Settings(BaseSettings):
     VIRTUAL_TRYON_DIR: Path = (BASE_DIR / "uploads" / "virtual_tryon").resolve()
 
 settings = Settings()
-os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-os.makedirs(settings.OUTFIT_IMAGE_DIR, exist_ok=True)
-os.makedirs(settings.VIRTUAL_TRYON_DIR, exist_ok=True)
-os.makedirs(settings.VTON_WEIGHTS_DIR, exist_ok=True)
+
+if settings.VTON_PROVIDER == "disabled":
+    settings.VTON_ENABLED = False
+
+for directory in (settings.UPLOAD_DIR, settings.OUTFIT_IMAGE_DIR, settings.VIRTUAL_TRYON_DIR, settings.VTON_WEIGHTS_DIR):
+    try:
+        os.makedirs(directory, exist_ok=True)
+    except OSError:
+        pass
 
 

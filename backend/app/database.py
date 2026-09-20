@@ -12,8 +12,8 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 def init_db():
-    Base.metadata.create_all(bind=engine)
     try:
+        Base.metadata.create_all(bind=engine)
         with engine.connect() as conn:
             insp = inspect(engine)
             if "saved_results" in insp.get_table_names():

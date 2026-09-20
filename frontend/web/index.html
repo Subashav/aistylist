@@ -2573,7 +2573,17 @@
        APPLICATION LOGIC & API INTEGRATION
        ======================================================================== -->
   <script>
-    const API_BASE = 'http://127.0.0.1:8000';
+    function getApiBase() {
+      if (window.API_BASE_URL) return window.API_BASE_URL.replace(/\/+$/, '');
+      const stored = localStorage.getItem('ai_stylist_api_url');
+      if (stored && stored.trim()) return stored.trim().replace(/\/+$/, '');
+      const hostname = window.location.hostname;
+      if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
+        return 'http://127.0.0.1:8000';
+      }
+      return window.location.origin;
+    }
+    let API_BASE = getApiBase();
     let currentUser = null;
     let authToken = localStorage.getItem('ai_stylist_token') || null;
     let _pendingAuthAction = null;
@@ -2728,6 +2738,19 @@
               <span class="profile-label">Virtual Try-On Model</span>
               <span class="profile-value">Local FASHN VTON v1.5 (NVIDIA GPU Acceleration)</span>
             </div>
+            <div class="profile-row">
+              <span class="profile-label">API Endpoint</span>
+              <span class="profile-value" style="font-family: monospace; font-size: 0.82rem;">${API_BASE}</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">API Status</span>
+              <span class="profile-value" id="profileApiStatus"><span style="color: var(--text-muted);">Testing...</span></span>
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <input type="url" id="customApiInput" class="auth-input" style="flex: 1; min-width: 220px; padding: 7px 10px; font-size: 0.8rem;" placeholder="Backend URL (e.g. http://127.0.0.1:8000)" value="${localStorage.getItem('ai_stylist_api_url') || ''}">
+              <button class="btn-secondary" onclick="saveCustomApiUrl()" style="padding: 7px 14px; font-size: 0.72rem;">SAVE</button>
+              <button class="btn-secondary" onclick="checkApiHealthUI()" style="padding: 7px 14px; font-size: 0.72rem;">PING</button>
+            </div>
             <div class="profile-row" style="border-bottom: none; margin-top: 24px;">
               <button class="btn-secondary" onclick="signOut()" style="padding: 12px 28px; font-size: 0.78rem;">SIGN OUT</button>
             </div>
@@ -2744,7 +2767,61 @@
               <button class="btn-secondary" onclick="openAuthModal('signup', () => { navigateTo('profile'); })">CREATE ACCOUNT</button>
             </div>
           </div>
+
+          <div class="profile-group" style="margin-top: 32px;">
+            <div class="profile-group-title">Backend API Server</div>
+            <div class="profile-row">
+              <span class="profile-label">Current Endpoint</span>
+              <span class="profile-value" style="font-family: monospace; font-size: 0.82rem;">${API_BASE}</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">Server Status</span>
+              <span class="profile-value" id="profileApiStatus"><span style="color: var(--text-muted);">Testing...</span></span>
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <input type="url" id="customApiInput" class="auth-input" style="flex: 1; min-width: 220px; padding: 7px 10px; font-size: 0.8rem;" placeholder="Backend URL (e.g. http://127.0.0.1:8000)" value="${localStorage.getItem('ai_stylist_api_url') || ''}">
+              <button class="btn-secondary" onclick="saveCustomApiUrl()" style="padding: 7px 14px; font-size: 0.72rem;">SAVE</button>
+              <button class="btn-secondary" onclick="checkApiHealthUI()" style="padding: 7px 14px; font-size: 0.72rem;">PING</button>
+            </div>
+          </div>
         `;
+        checkApiHealthUI();
+      }
+    }
+
+
+    function saveCustomApiUrl() {
+      const input = document.getElementById('customApiInput');
+      if (!input) return;
+      const val = input.value.trim().replace(/\/+$/, '');
+      if (val) {
+        localStorage.setItem('ai_stylist_api_url', val);
+      } else {
+        localStorage.removeItem('ai_stylist_api_url');
+      }
+      API_BASE = getApiBase();
+      showToast('API URL updated: ' + API_BASE);
+      updateProfileUI();
+      checkApiHealthUI();
+    }
+
+    async function checkApiHealthUI() {
+      const statusEl = document.getElementById('profileApiStatus');
+      if (!statusEl) return;
+      statusEl.innerHTML = '<span style="color: var(--text-muted);">Testing connection...</span>';
+      try {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), 3500);
+        const res = await fetch(`${API_BASE}/health`, { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (res.ok) {
+          const data = await res.json();
+          statusEl.innerHTML = `<span style="color: #2e7d32; font-weight: 500;">● Online</span> (${data.service || 'Ready'})`;
+        } else {
+          statusEl.innerHTML = `<span style="color: #c62828;">● HTTP ${res.status}</span>`;
+        }
+      } catch (err) {
+        statusEl.innerHTML = `<span style="color: #d97706;">● Unreachable (${err.message || 'offline'})</span>`;
       }
     }
 
