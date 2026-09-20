@@ -3273,6 +3273,7 @@
       const looks = data.outfit_suggestions || [];
       looks.forEach((look, index) => {
         const isActualTryOn = (index < 2) && look.image_url && (look.result_type === 'actual_try_on' || look.try_on_type === 'actual_try_on');
+        const isUnavailable = (look.result_type === 'unavailable' || look.try_on_type === 'unavailable');
         const fullImgUrl = look.image_url ? (look.image_url.startsWith('http') ? look.image_url : `${API_BASE}${look.image_url}`) : '';
 
         const lookNumStr = `LOOK 0${look.look_id || index + 1}`;
@@ -3326,7 +3327,7 @@
         if (isActualTryOn) {
           visualStageHtml = `
             <div class="look-image-stage" onclick="openLightbox(${index})">
-              <img src="${fullImgUrl}" alt="${look.title}" onerror="this.src='https://placehold.co/800x1000/F7F7F5/111111?text=Virtual+Try-On'" />
+              <img src="${fullImgUrl}" alt="${look.title}" onerror="handleImageLoadError(this, '${look.title}')" />
               <div class="image-hover-cue">VIEW LOOK →</div>
             </div>
           `;
@@ -3339,8 +3340,20 @@
             </div>
           `).join('');
 
+          const unavailableNoticeHtml = (isUnavailable && index < 2) ? `
+            <div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color, #E5E5E5); padding: 14px 18px; margin-bottom: 16px; border-radius: 2px;">
+              <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-primary, #111111); margin-bottom: 4px;">
+                Virtual Try-On Notice
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted, #737373); line-height: 1.5;">
+                Photorealistic rendering requires local NVIDIA GPU or production FASHN Cloud API key. Full outfit coordination and material specifications are detailed below.
+              </div>
+            </div>
+          ` : '';
+
           visualStageHtml = `
             <div class="moodboard-stage">
+              ${unavailableNoticeHtml}
               <div>
                 <h4 class="moodboard-stage-title">OUTFIT & FABRIC DIRECTION</h4>
                 <p class="moodboard-stage-desc">Calibrated color blocking and tactile material textures</p>
@@ -3356,14 +3369,24 @@
           `;
         }
 
+        let badgeText = 'OUTFIT & MATERIAL GUIDE';
+        let badgeClass = 'guide-mode';
+        if (isActualTryOn) {
+          badgeText = 'ACTUAL TRY-ON (FASHN VTON)';
+          badgeClass = 'actual-tryon';
+        } else if (isUnavailable && index < 2) {
+          badgeText = 'VTON REQUIRES GPU / API';
+          badgeClass = 'guide-mode';
+        }
+
         const card = document.createElement('div');
         card.className = 'look-editorial-card';
 
         card.innerHTML = `
           <div class="look-card-header">
             <span class="look-number-label">${lookNumStr}</span>
-            <span class="look-badge ${isActualTryOn ? 'actual-tryon' : 'guide-mode'}">
-              ${isActualTryOn ? 'ACTUAL TRY-ON (FASHN VTON)' : 'OUTFIT & MATERIAL GUIDE'}
+            <span class="look-badge ${badgeClass}">
+              ${badgeText}
             </span>
           </div>
 
@@ -3433,6 +3456,23 @@
       });
 
       resultsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // -------------------------------------------------------------------------
+    // Elegant Error Handling for Visuals
+    // -------------------------------------------------------------------------
+    function handleImageLoadError(imgEl, lookTitle) {
+      const stage = imgEl.closest('.look-image-stage');
+      if (!stage) return;
+      stage.onclick = null;
+      stage.style.cursor = 'default';
+      stage.innerHTML = `
+        <div style="height:100%;min-height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:#FAFAF9;color:#737373;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="margin-bottom:12px;opacity:0.6;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;color:#171717;margin-bottom:6px;">Try-On Preview Unavailable</span>
+          <span style="font-size:12px;line-height:1.5;max-width:240px;">Rendering requires local GPU workstation or configured FASHN Cloud API key. Full outfit and fabric guide loaded below.</span>
+        </div>
+      `;
     }
 
     // -------------------------------------------------------------------------

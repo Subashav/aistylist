@@ -22,6 +22,12 @@ class AppConfig {
     if (_customBaseUrl.isNotEmpty) {
       return _customBaseUrl;
     }
+    if (kIsWeb) {
+      final origin = Uri.base.origin;
+      if (origin.isNotEmpty && !origin.contains('localhost') && !origin.contains('127.0.0.1')) {
+        return origin;
+      }
+    }
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       return androidEmulatorBaseUrl;
     }

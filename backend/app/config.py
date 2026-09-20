@@ -70,13 +70,22 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-3.6-flash"
     GEMINI_TIMEOUT: int = 15
 
-    # Virtual Try-On Provider: "local" (default for Windows GPU) or "disabled"
+    # Virtual Try-On Provider: "local" (default for Windows GPU), "production" (FASHN Cloud API), or "disabled"
     VTON_PROVIDER: str = os.getenv("VTON_PROVIDER", "local")
     VTON_ENABLED: bool = True
     VTON_MODEL_NAME: str = "FASHN VTON v1.5"
     VTON_WEIGHTS_DIR: Path = (BASE_DIR / "weights").resolve()
     TRYON_MAX_LOOKS: int = 2  # 2 personalized try-on images; remaining are complete outfit & material guides
     VIRTUAL_TRYON_DIR: Path = (DATA_DIR / "uploads" / "virtual_tryon").resolve()
+
+    # Production FASHN Cloud API (https://api.fashn.ai)
+    FASHN_API_KEY: str = ""
+    FASHN_API_URL: str = "https://api.fashn.ai/v1"
+    FASHN_API_TIMEOUT: int = 60
+
+    # Storage Provider: 'auto', 'local', or 'production'
+    STORAGE_PROVIDER: str = "auto"
+    STORAGE_BASE_URL: str = ""
 
 
 settings = Settings()

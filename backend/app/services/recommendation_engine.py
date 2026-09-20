@@ -224,16 +224,16 @@ def generate_fashion_recommendations(
     swatches = rule["swatches"]
 
     # Extract semantic attributes if present
-    subcategory = getattr(semantic_data, "subcategory", clothing_type) if semantic_data else clothing_type
-    pattern = getattr(semantic_data, "pattern", "Solid") if semantic_data else "Solid"
-    neckline = getattr(semantic_data, "neckline", "Crewneck") if semantic_data else "Crewneck"
-    fit = getattr(semantic_data, "fit", "Regular") if semantic_data else "Regular"
-    top_material = getattr(semantic_data, "material_appearance", "Cotton") if semantic_data else "Cotton"
+    subcategory = (getattr(semantic_data, "subcategory", None) if semantic_data else None) or clothing_type or "Piece"
+    pattern = (getattr(semantic_data, "pattern", None) if semantic_data else None) or "Solid"
+    neckline = (getattr(semantic_data, "neckline", None) if semantic_data else None) or "Crewneck"
+    fit = (getattr(semantic_data, "fit", None) if semantic_data else None) or "Regular"
+    top_material = (getattr(semantic_data, "material_appearance", None) if semantic_data else None) or "Cotton"
 
     # Extract user styling attributes if present
-    complexion = getattr(user_profile, "complexion_tone", "Neutral / Balanced") if user_profile else "Neutral / Balanced"
-    build = getattr(user_profile, "apparent_build", "Proportionate") if user_profile else "Proportionate"
-    silhouette_pref = getattr(user_profile, "styling_silhouette_preference", "Clean vertical lines") if user_profile else "Clean vertical lines"
+    complexion = (getattr(user_profile, "complexion_tone", None) if user_profile else None) or "Neutral / Balanced"
+    build = (getattr(user_profile, "apparent_build", None) if user_profile else None) or "Proportionate"
+    silhouette_pref = (getattr(user_profile, "styling_silhouette_preference", None) if user_profile else None) or "Clean vertical lines"
     is_personalized = bool(user_profile and getattr(user_profile, "is_valid_person", True))
 
     primary_top = f"{colour_shade} {subcategory}"
